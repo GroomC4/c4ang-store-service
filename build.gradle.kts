@@ -15,7 +15,11 @@ allprojects {
     version = "0.0.1-SNAPSHOT"
 
     repositories {
+        mavenLocal() // Maven Local 저장소 추가 (contract-hub 의존성)
         mavenCentral()
+        maven {
+            url = uri("https://packages.confluent.io/maven/")
+        }
     }
 
     extensions.findByType<KotlinJvmProjectExtension>()?.apply {
@@ -41,5 +45,5 @@ subprojects {
 }
 
 tasks.register("bootRun") {
-    dependsOn(":customer-api:bootRun")
+    dependsOn(":store-api:bootRun")
 }

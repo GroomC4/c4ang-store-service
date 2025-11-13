@@ -28,13 +28,21 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
 
+    // Kafka
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation("io.confluent:kafka-avro-serializer:7.5.1")
+    implementation("io.confluent:kafka-schema-registry-client:7.5.1")
+
+    // Contract Hub (Avro 스키마) - Maven Local에서 가져오기
+    implementation("com.c4ang:c4ang-contract-hub:1.0.0-SNAPSHOT")
+
     // Spring Cloud BOM (Spring Boot 3.3.4와 호환)
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.3"))
 
     // Spring Cloud OpenFeign (버전은 BOM에서 관리)
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
-    // Logging
+    // Logging방ㅇ
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
 
     // Redisson (Redis 클라이언트 with 원자적 연산 지원)
