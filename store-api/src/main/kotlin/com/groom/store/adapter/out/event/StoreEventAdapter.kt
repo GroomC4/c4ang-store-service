@@ -33,6 +33,12 @@ class StoreEventAdapter(
         val topic = kafkaProperties.topics.storeInfoUpdated
         val partitionKey = event.storeId.toString()
 
+        // 변경된 필드 목록 생성
+        val updatedFields = mutableListOf<String>()
+        if (event.isNameChanged()) updatedFields.add("storeName")
+        if (event.isDescriptionChanged()) updatedFields.add("storeDescription")
+        if (event.isStatusChanged()) updatedFields.add("storeStatus")
+
         // Domain Event → Avro Event 변환
         val avroEvent =
             StoreInfoUpdated
@@ -40,18 +46,21 @@ class StoreEventAdapter(
                 .setEventId(UUID.randomUUID().toString())
                 .setEventTimestamp(System.currentTimeMillis())
                 .setStoreId(event.storeId.toString())
-                .setStoreName(event.newName)
-                .setStoreStatus("ACTIVE") // TODO: 실제 status 전달
-                .setStoreDescription(event.newDescription)
+                .setStoreName(event.after.name)
+                .setStoreStatus(event.after.status.name)
+                .setStoreDescription(event.after.description)
                 .setStorePhone(null)
                 .setStoreAddress(null)
                 .setBusinessHours(null)
                 .setStoreImageUrl(null)
-                .setUpdatedFields(listOf("storeName", "storeDescription"))
+                .setUpdatedFields(updatedFields)
                 .setUpdatedAt(System.currentTimeMillis())
                 .build()
 
-        logger.info { "Publishing store.info.updated event: eventId=${avroEvent.eventId}, storeId=${event.storeId}" }
+        logger.info {
+            "Publishing store.info.updated event: eventId=${avroEvent.eventId}, " +
+            "storeId=${event.storeId}, updatedFields=$updatedFields"
+        }
 
         kafkaTemplate.send(topic, partitionKey, avroEvent).apply {
             whenComplete { result, ex ->

@@ -117,10 +117,16 @@ class Store(
             StoreInfoUpdatedEvent(
                 storeId = this.id,
                 ownerUserId = this.ownerUserId,
-                oldName = this.name,
-                newName = name,
-                oldDescription = this.description,
-                newDescription = description,
+                before = com.groom.store.domain.event.StoreInfoSnapshot(
+                    name = this.name,
+                    description = this.description,
+                    status = this.status,
+                ),
+                after = com.groom.store.domain.event.StoreInfoSnapshot(
+                    name = name,
+                    description = description,
+                    status = this.status,
+                ),
             )
 
         return UpdateInfoResult(updatedStore, event)

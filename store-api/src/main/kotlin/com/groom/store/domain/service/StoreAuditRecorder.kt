@@ -61,7 +61,11 @@ class StoreAuditRecorder(
      * @param event 스토어 정보 수정 이벤트
      */
     fun recordStoreInfoUpdated(event: StoreInfoUpdatedEvent) {
-        logger.info { "Recording store info updated: storeId=${event.storeId}, oldName=${event.oldName}, newName=${event.newName}" }
+        logger.info {
+            "Recording store info updated: storeId=${event.storeId}, " +
+            "before=(name=${event.before.name}, status=${event.before.status}), " +
+            "after=(name=${event.after.name}, status=${event.after.status})"
+        }
 
         val changeSummary = buildInfoUpdateChangeSummary(event)
         val metadata = buildInfoUpdateMetadata(event)
@@ -70,7 +74,7 @@ class StoreAuditRecorder(
             StoreAudit(
                 storeId = event.storeId,
                 eventType = StoreAuditEventType.INFO_UPDATED,
-                statusSnapshot = null, // 정보 수정은 상태 변경이 아님
+                statusSnapshot = if (event.isStatusChanged()) event.after.status else null,
                 changeSummary = changeSummary,
                 actorUserId = event.ownerUserId,
                 recordedAt = event.occurredAt,
@@ -117,14 +121,18 @@ class StoreAuditRecorder(
     private fun buildInfoUpdateChangeSummary(event: StoreInfoUpdatedEvent): String {
         val changes = mutableListOf<String>()
 
-        if (event.oldName != event.newName) {
-            changes.add("이름: '${event.oldName}' → '${event.newName}'")
+        if (event.isNameChanged()) {
+            changes.add("이름: '${event.before.name}' → '${event.after.name}'")
         }
 
-        if (event.oldDescription != event.newDescription) {
-            val oldDesc = event.oldDescription ?: "없음"
-            val newDesc = event.newDescription ?: "없음"
+        if (event.isDescriptionChanged()) {
+            val oldDesc = event.before.description ?: "없음"
+            val newDesc = event.after.description ?: "없음"
             changes.add("설명: '$oldDesc' → '$newDesc'")
+        }
+
+        if (event.isStatusChanged()) {
+            changes.add("상태: '${event.before.status}' → '${event.after.status}'")
         }
 
         return changes.joinToString(", ")
@@ -135,9 +143,15 @@ class StoreAuditRecorder(
      */
     private fun buildInfoUpdateMetadata(event: StoreInfoUpdatedEvent): Map<String, Any> =
         mapOf(
-            "oldName" to event.oldName,
-            "newName" to event.newName,
-            "oldDescription" to (event.oldDescription ?: ""),
-            "newDescription" to (event.newDescription ?: ""),
+            "before" to mapOf(
+                "name" to event.before.name,
+                "description" to (event.before.description ?: ""),
+                "status" to event.before.status.name,
+            ),
+            "after" to mapOf(
+                "name" to event.after.name,
+                "description" to (event.after.description ?: ""),
+                "status" to event.after.status.name,
+            ),
         )
 }

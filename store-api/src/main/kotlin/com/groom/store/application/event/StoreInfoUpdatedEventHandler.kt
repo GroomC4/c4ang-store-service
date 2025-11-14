@@ -39,10 +39,10 @@ class StoreInfoUpdatedEventHandler(
 
         // TODO: Product 도메인 의존성 구현 후 활성화
         // 2. 스토어 이름이 변경된 경우 p_product의 비정규화 컬럼(store_name) 일괄 업데이트
-        // if (event.oldName != event.newName) {
+        // if (event.isNameChanged()) {
         //     productRepository.bulkUpdateStoreName(
         //         storeId = event.storeId,
-        //         newStoreName = event.newName,
+        //         newStoreName = event.after.name,
         //     )
         // }
     }
