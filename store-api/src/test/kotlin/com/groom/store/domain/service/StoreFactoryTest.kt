@@ -1,10 +1,8 @@
 package com.groom.store.domain.service
 
-import com.groom.ecommerce.common.annotation.UnitTest
-import com.groom.ecommerce.common.exception.StoreException
+import com.groom.store.common.annotation.UnitTest
 import com.groom.store.common.enums.StoreStatus
-import com.groom.store.domain.service.StoreFactory
-import com.groom.store.domain.service.StorePolicy
+import com.groom.store.common.exception.StoreException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec

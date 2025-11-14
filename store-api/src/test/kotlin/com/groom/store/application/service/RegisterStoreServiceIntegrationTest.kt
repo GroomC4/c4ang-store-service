@@ -1,30 +1,36 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.common.TransactionApplier
-import com.groom.ecommerce.common.exception.StoreException
-import com.groom.ecommerce.common.exception.UserException
 import com.groom.store.application.dto.RegisterStoreCommand
-import com.groom.store.application.service.RegisterService
+import com.groom.store.common.TransactionApplier
 import com.groom.store.common.annotation.IntegrationTest
+import com.groom.store.common.config.MockUserServiceConfig
 import com.groom.store.common.enums.StoreAuditEventType
 import com.groom.store.common.enums.StoreStatus
-import com.groom.store.infrastructure.repository.StoreAuditRepositoryImpl
+import com.groom.store.common.exception.StoreException
+import com.groom.store.common.exception.UserException
+import com.groom.store.outbound.client.UserResponse
+import com.groom.store.outbound.client.UserRole
+import com.groom.store.outbound.client.UserServiceClient
+import com.groom.store.outbound.repository.StoreAuditRepositoryImpl
 import com.groom.store.outbound.repository.StoreRepositoryImpl
+import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import java.util.UUID
 
 @IntegrationTest
 @SpringBootTest
+@Import(MockUserServiceConfig::class)
 @SqlGroup(
-    Sql(scripts = ["/sql/store/cleanup-register-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
-    Sql(scripts = ["/sql/store/init-register-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
-    Sql(scripts = ["/sql/store/cleanup-register-store-service.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD),
+    Sql(scripts = ["/sql/cleanup-register-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+    Sql(scripts = ["/sql/init-register-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+    Sql(scripts = ["/sql/cleanup-register-store-service.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD),
 )
 class RegisterStoreServiceIntegrationTest {
     @Autowired
@@ -38,6 +44,9 @@ class RegisterStoreServiceIntegrationTest {
 
     @Autowired
     private lateinit var transactionApplier: TransactionApplier
+
+    @Autowired
+    private lateinit var userServiceClient: UserServiceClient
 
     companion object {
         // Test user IDs from SQL scripts
@@ -53,6 +62,13 @@ class RegisterStoreServiceIntegrationTest {
     @Test
     fun `OWNER 역할을 가진 사용자가 스토어를 성공적으로 등록한다`() {
         // given
+        every { userServiceClient.get(OWNER_USER_ID_1) } returns
+            UserResponse(
+                id = OWNER_USER_ID_1,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
+
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_1,
@@ -95,6 +111,13 @@ class RegisterStoreServiceIntegrationTest {
     @Test
     fun `CUSTOMER 역할 사용자가 스토어 등록을 시도하면 실패한다`() {
         // given
+        every { userServiceClient.get(CUSTOMER_USER_ID_1) } returns
+            UserResponse(
+                id = CUSTOMER_USER_ID_1,
+                name = "Test Owner",
+                role = UserRole.CUSTOMER,
+            )
+
         val command =
             RegisterStoreCommand(
                 ownerUserId = CUSTOMER_USER_ID_1,
@@ -121,6 +144,13 @@ class RegisterStoreServiceIntegrationTest {
     @Test
     fun `이미 스토어를 보유한 OWNER가 중복 등록을 시도하면 실패한다`() {
         // given - OWNER_USER_ID_2는 이미 EXISTING_STORE_ID를 소유
+        every { userServiceClient.get(OWNER_USER_ID_2) } returns
+            UserResponse(
+                id = OWNER_USER_ID_2,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
+
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_2,
@@ -148,6 +178,8 @@ class RegisterStoreServiceIntegrationTest {
     fun `존재하지 않는 사용자가 스토어 등록을 시도하면 실패한다`() {
         // given
         val nonExistentUserId = UUID.randomUUID()
+        every { userServiceClient.get(nonExistentUserId) } throws UserException.UserNotFound(nonExistentUserId)
+
         val command =
             RegisterStoreCommand(
                 ownerUserId = nonExistentUserId,
@@ -172,6 +204,13 @@ class RegisterStoreServiceIntegrationTest {
     @Test
     fun `등록된 스토어가 DB에 올바르게 저장되고 모든 필드가 정확하게 유지된다`() {
         // given
+        every { userServiceClient.get(OWNER_USER_ID_3) } returns
+            UserResponse(
+                id = OWNER_USER_ID_3,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
+
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_3,
@@ -216,6 +255,13 @@ class RegisterStoreServiceIntegrationTest {
     @Test
     fun `description이 null인 경우에도 스토어가 정상적으로 등록된다`() {
         // given
+        every { userServiceClient.get(OWNER_USER_ID_4) } returns
+            UserResponse(
+                id = OWNER_USER_ID_4,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
+
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_4,
@@ -239,6 +285,13 @@ class RegisterStoreServiceIntegrationTest {
     @Test
     fun `스토어 등록 시 감사 로그가 생성된다`() {
         // given
+        every { userServiceClient.get(OWNER_USER_ID_5) } returns
+            UserResponse(
+                id = OWNER_USER_ID_5,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
+
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_5,
@@ -264,7 +317,7 @@ class RegisterStoreServiceIntegrationTest {
             assertThat(audit.metadata).isNotNull
             assertThat(audit.metadata!!["storeName"]).isEqualTo("감사로그 테스트 스토어")
             assertThat(audit.metadata!!["description"]).isEqualTo("감사 로그 생성 확인용")
-            assertThat(audit.metadata!!["createdBy"]).isEqualTo(OWNER_USER_ID_5.toString())
+            assertThat(audit.metadata["createdBy"]).isEqualTo(OWNER_USER_ID_5.toString())
             assertThat(audit.recordedAt).isNotNull
         }
     }

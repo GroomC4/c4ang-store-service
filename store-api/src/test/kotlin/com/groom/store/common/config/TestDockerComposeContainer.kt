@@ -39,5 +39,11 @@ class TestDockerComposeContainer {
          * BaseContainerExtension에 위임합니다.
          */
         fun getRedisMappedPort(): Int = BaseContainerExtension.getRedisPort()
+
+        /**
+         * Kafka Bootstrap Servers를 반환합니다.
+         * BaseContainerExtension에 위임합니다.
+         */
+        fun getKafkaBootstrapServers(): String = BaseContainerExtension.getKafkaBootstrapServers()
     }
 }

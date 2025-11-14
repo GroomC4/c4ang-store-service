@@ -1,14 +1,15 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.common.annotation.UnitTest
-import com.groom.ecommerce.common.domain.DomainEventPublisher
-import com.groom.ecommerce.common.exception.StoreException
 import com.groom.store.application.dto.UpdateStoreCommand
+import com.groom.store.common.annotation.UnitTest
 import com.groom.store.common.enums.StoreStatus
+import com.groom.store.common.exception.StoreException
 import com.groom.store.domain.model.Store
+import com.groom.store.domain.port.LoadStorePort
+import com.groom.store.domain.port.PublishEventPort
+import com.groom.store.domain.port.SaveStorePort
 import com.groom.store.domain.service.StorePolicy
 import com.groom.store.fixture.StoreTestFixture
-import com.groom.store.outbound.repository.StoreRepositoryImpl
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -20,7 +21,6 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import java.time.LocalDateTime
-import java.util.Optional
 import java.util.UUID
 
 @UnitTest
@@ -30,15 +30,17 @@ class UpdateStoreServiceTest :
         isolationMode = IsolationMode.InstancePerLeaf
 
         Given("스토어 소유자가 자신의 스토어를 수정하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val loadStorePort = mockk<LoadStorePort>()
+            val saveStorePort = mockk<SaveStorePort>()
+            val publishEventPort = mockk<PublishEventPort>()
             val storePolicy = mockk<StorePolicy>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
 
             val updateService =
                 UpdateService(
-                    storeRepository = storeRepository,
+                    loadStorePort = loadStorePort,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                     storePolicy = storePolicy,
-                    domainEventPublisher = domainEventPublisher,
                 )
 
             val storeId = UUID.randomUUID()
@@ -64,9 +66,9 @@ class UpdateStoreServiceTest :
                     updatedAt = LocalDateTime.now(),
                 )
 
-            every { storeRepository.findById(storeId) } returns Optional.of(existingStore)
-            every { storeRepository.save(any<Store>()) } answers { firstArg() }
-            every { domainEventPublisher.publish(any()) } just runs
+            every { loadStorePort.loadById(storeId) } returns existingStore
+            every { saveStorePort.save(any<Store>()) } answers { firstArg() }
+            every { publishEventPort.publishStoreInfoUpdated(any()) } just runs
 
             When("스토어를 수정하면") {
                 val result = updateService.update(command)
@@ -86,15 +88,17 @@ class UpdateStoreServiceTest :
         }
 
         Given("존재하지 않는 스토어를 수정하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val loadStorePort = mockk<LoadStorePort>()
+            val saveStorePort = mockk<SaveStorePort>()
+            val publishEventPort = mockk<PublishEventPort>()
             val storePolicy = mockk<StorePolicy>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
 
             val updateService =
                 UpdateService(
-                    storeRepository = storeRepository,
+                    loadStorePort = loadStorePort,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                     storePolicy = storePolicy,
-                    domainEventPublisher = domainEventPublisher,
                 )
 
             val storeId = UUID.randomUUID()
@@ -108,7 +112,7 @@ class UpdateStoreServiceTest :
                 )
 
             every { storePolicy.checkStoreAccess(storeId, userId) } just runs
-            every { storeRepository.findById(storeId) } returns Optional.empty()
+            every { loadStorePort.loadById(storeId) } returns null
 
             When("스토어를 수정하려고 하면") {
                 Then("StoreException.StoreNotFound 예외가 발생한다") {
@@ -125,15 +129,17 @@ class UpdateStoreServiceTest :
         }
 
         Given("스토어 소유자가 아닌 사용자가 스토어를 수정하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val loadStorePort = mockk<LoadStorePort>()
+            val saveStorePort = mockk<SaveStorePort>()
+            val publishEventPort = mockk<PublishEventPort>()
             val storePolicy = mockk<StorePolicy>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
 
             val updateService =
                 UpdateService(
-                    storeRepository = storeRepository,
+                    loadStorePort = loadStorePort,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                     storePolicy = storePolicy,
-                    domainEventPublisher = domainEventPublisher,
                 )
 
             val storeId = UUID.randomUUID()
@@ -166,15 +172,17 @@ class UpdateStoreServiceTest :
         }
 
         Given("description을 null로 수정하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val loadStorePort = mockk<LoadStorePort>()
+            val saveStorePort = mockk<SaveStorePort>()
+            val publishEventPort = mockk<PublishEventPort>()
             val storePolicy = mockk<StorePolicy>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
 
             val updateService =
                 UpdateService(
-                    storeRepository = storeRepository,
+                    loadStorePort = loadStorePort,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                     storePolicy = storePolicy,
-                    domainEventPublisher = domainEventPublisher,
                 )
 
             val storeId = UUID.randomUUID()
@@ -205,8 +213,8 @@ class UpdateStoreServiceTest :
                     updatedAtField.set(this, LocalDateTime.now())
                 }
 
-            every { storeRepository.findById(storeId) } returns Optional.of(existingStore)
-            every { storeRepository.save(any<Store>()) } answers {
+            every { loadStorePort.loadById(storeId) } returns existingStore
+            every { saveStorePort.save(any<Store>()) } answers {
                 // 불변 객체 패턴: 저장된 Store 반환 (updatedAt 설정)
                 val store = firstArg<Store>()
                 val updatedAtField =
@@ -216,7 +224,7 @@ class UpdateStoreServiceTest :
                 updatedAtField.set(store, LocalDateTime.now())
                 store
             }
-            every { domainEventPublisher.publish(any()) } just runs
+            every { publishEventPort.publishStoreInfoUpdated(any()) } just runs
 
             When("스토어를 수정하면") {
                 val result = updateService.update(command)
@@ -227,9 +235,9 @@ class UpdateStoreServiceTest :
                     result.name shouldBe command.name
 
                     verify(exactly = 1) { storePolicy.checkStoreAccess(storeId, userId) }
-                    verify(exactly = 1) { storeRepository.findById(storeId) }
-                    verify(exactly = 1) { storeRepository.save(any<Store>()) } // 불변 객체 패턴
-                    verify(exactly = 1) { domainEventPublisher.publish(any()) }
+                    verify(exactly = 1) { loadStorePort.loadById(storeId) }
+                    verify(exactly = 1) { saveStorePort.save(any<Store>()) } // 불변 객체 패턴
+                    verify(exactly = 1) { publishEventPort.publishStoreInfoUpdated(any()) }
                 }
             }
         }

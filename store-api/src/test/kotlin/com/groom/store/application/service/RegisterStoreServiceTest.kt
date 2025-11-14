@@ -1,15 +1,15 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.common.annotation.UnitTest
-import com.groom.ecommerce.common.domain.DomainEventPublisher
-import com.groom.ecommerce.common.exception.StoreException
 import com.groom.store.application.dto.RegisterStoreCommand
 import com.groom.store.application.service.RegisterService
+import com.groom.store.common.annotation.UnitTest
 import com.groom.store.common.enums.StoreStatus
+import com.groom.store.common.exception.StoreException
+import com.groom.store.domain.port.PublishEventPort
+import com.groom.store.domain.port.SaveStorePort
 import com.groom.store.domain.service.SellerPolicy
 import com.groom.store.domain.service.StoreFactory
 import com.groom.store.fixture.StoreTestFixture
-import com.groom.store.outbound.repository.StoreRepositoryImpl
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -29,17 +29,17 @@ class RegisterStoreServiceTest :
         isolationMode = IsolationMode.InstancePerLeaf
 
         Given("유효한 스토어 등록 정보가 주어졌을 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val saveStorePort = mockk<SaveStorePort>()
             val sellerPolicy = mockk<SellerPolicy>()
             val storeFactory = mockk<StoreFactory>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
+            val publishEventPort = mockk<PublishEventPort>()
 
             val registerService =
                 RegisterService(
-                    storeRepository = storeRepository,
                     sellerPolicy = sellerPolicy,
                     storeFactory = storeFactory,
-                    domainEventPublisher = domainEventPublisher,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                 )
 
             val ownerUserId = UUID.randomUUID()
@@ -83,8 +83,8 @@ class RegisterStoreServiceTest :
                     createdAt = testCreatedAt,
                 )
 
-            every { storeRepository.save(any()) } returns savedStore
-            every { domainEventPublisher.publish(any()) } just runs
+            every { saveStorePort.save(any()) } returns savedStore
+            every { publishEventPort.publishStoreCreated(any()) } just runs
 
             When("스토어를 등록하면") {
                 val result = registerService.register(command)
@@ -104,17 +104,17 @@ class RegisterStoreServiceTest :
         }
 
         Given("이미 스토어를 보유한 사용자가 스토어를 등록하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val saveStorePort = mockk<SaveStorePort>()
             val sellerPolicy = mockk<SellerPolicy>()
             val storeFactory = mockk<StoreFactory>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
+            val publishEventPort = mockk<PublishEventPort>()
 
             val registerService =
                 RegisterService(
-                    storeRepository = storeRepository,
                     sellerPolicy = sellerPolicy,
                     storeFactory = storeFactory,
-                    domainEventPublisher = domainEventPublisher,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                 )
 
             val ownerUserId = UUID.randomUUID()

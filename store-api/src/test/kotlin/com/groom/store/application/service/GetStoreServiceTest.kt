@@ -1,11 +1,11 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.common.annotation.UnitTest
-import com.groom.ecommerce.common.exception.StoreException
 import com.groom.store.application.dto.GetStoreQuery
+import com.groom.store.common.annotation.UnitTest
 import com.groom.store.common.enums.StoreStatus
+import com.groom.store.common.exception.StoreException
+import com.groom.store.domain.port.LoadStorePort
 import com.groom.store.fixture.StoreTestFixture
-import com.groom.store.outbound.repository.StoreRepositoryImpl
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -13,7 +13,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
-import java.util.Optional
 import java.util.UUID
 
 @UnitTest
@@ -23,12 +22,8 @@ class GetStoreServiceTest :
         isolationMode = IsolationMode.InstancePerLeaf
 
         Given("존재하는 스토어를 조회하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
-
-            val getStoreService =
-                GetStoreService(
-                    reader = storeRepository,
-                )
+            val loadStorePort = mockk<LoadStorePort>()
+            val getStoreService = GetStoreService(loadStorePort = loadStorePort)
 
             val storeId = UUID.randomUUID()
             val ownerId = UUID.randomUUID()
@@ -45,7 +40,7 @@ class GetStoreServiceTest :
                     reviewCount = 100,
                 )
 
-            every { storeRepository.findById(storeId) } returns Optional.of(existingStore)
+            every { loadStorePort.loadById(storeId) } returns existingStore
 
             When("스토어를 조회하면") {
                 val result = getStoreService.getStore(query)
@@ -67,17 +62,13 @@ class GetStoreServiceTest :
         }
 
         Given("존재하지 않는 스토어를 조회하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
-
-            val getStoreService =
-                GetStoreService(
-                    reader = storeRepository,
-                )
+            val loadStorePort = mockk<LoadStorePort>()
+            val getStoreService = GetStoreService(loadStorePort = loadStorePort)
 
             val storeId = UUID.randomUUID()
             val query = GetStoreQuery(storeId = storeId)
 
-            every { storeRepository.findById(storeId) } returns Optional.empty()
+            every { loadStorePort.loadById(storeId) } returns null
 
             When("스토어를 조회하려고 하면") {
                 Then("StoreException.StoreNotFound 예외가 발생한다") {
@@ -92,12 +83,8 @@ class GetStoreServiceTest :
         }
 
         Given("삭제된 스토어를 조회하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
-
-            val getStoreService =
-                GetStoreService(
-                    reader = storeRepository,
-                )
+            val loadStorePort = mockk<LoadStorePort>()
+            val getStoreService = GetStoreService(loadStorePort = loadStorePort)
 
             val storeId = UUID.randomUUID()
             val ownerId = UUID.randomUUID()
@@ -114,7 +101,7 @@ class GetStoreServiceTest :
                     reviewCount = 0,
                 )
 
-            every { storeRepository.findById(storeId) } returns Optional.of(deletedStore)
+            every { loadStorePort.loadById(storeId) } returns deletedStore
 
             When("스토어를 조회하면") {
                 val result = getStoreService.getStore(query)
@@ -129,12 +116,8 @@ class GetStoreServiceTest :
         }
 
         Given("평점 정보가 없는 스토어를 조회할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
-
-            val getStoreService =
-                GetStoreService(
-                    reader = storeRepository,
-                )
+            val loadStorePort = mockk<LoadStorePort>()
+            val getStoreService = GetStoreService(loadStorePort = loadStorePort)
 
             val storeId = UUID.randomUUID()
             val ownerId = UUID.randomUUID()
@@ -149,7 +132,7 @@ class GetStoreServiceTest :
                     status = StoreStatus.REGISTERED,
                 )
 
-            every { storeRepository.findById(storeId) } returns Optional.of(storeWithoutRating)
+            every { loadStorePort.loadById(storeId) } returns storeWithoutRating
 
             When("스토어를 조회하면") {
                 val result = getStoreService.getStore(query)

@@ -1,6 +1,7 @@
 package com.groom.store.application.event
 
 import com.groom.store.application.event.StoreCreatedEventHandler
+import com.groom.store.common.annotation.UnitTest
 import com.groom.store.domain.event.StoreCreatedEvent
 import com.groom.store.domain.service.StoreAuditRecorder
 import io.kotest.core.spec.style.FunSpec

@@ -1,26 +1,28 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.common.TransactionApplier
-import com.groom.ecommerce.common.exception.StoreException
 import com.groom.store.application.dto.UpdateStoreCommand
-import com.groom.store.application.service.UpdateService
+import com.groom.store.common.TransactionApplier
 import com.groom.store.common.annotation.IntegrationTest
+import com.groom.store.common.config.MockUserServiceConfig
+import com.groom.store.common.exception.StoreException
 import com.groom.store.outbound.repository.StoreRepositoryImpl
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import java.util.UUID
 
 @IntegrationTest
 @SpringBootTest
+@Import(MockUserServiceConfig::class)
 @SqlGroup(
-    Sql(scripts = ["/sql/store/cleanup-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
-    Sql(scripts = ["/sql/store/init-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
-    Sql(scripts = ["/sql/store/cleanup-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD),
+    Sql(scripts = ["/sql/cleanup-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+    Sql(scripts = ["/sql/init-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+    Sql(scripts = ["/sql/cleanup-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD),
 )
 class UpdateStoreServiceIntegrationTest {
     @Autowired

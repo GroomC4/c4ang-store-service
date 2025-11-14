@@ -63,8 +63,8 @@ class StoreAuditRecorder(
     fun recordStoreInfoUpdated(event: StoreInfoUpdatedEvent) {
         logger.info {
             "Recording store info updated: storeId=${event.storeId}, " +
-            "before=(name=${event.before.name}, status=${event.before.status}), " +
-            "after=(name=${event.after.name}, status=${event.after.status})"
+                "before=(name=${event.before.name}, status=${event.before.status}), " +
+                "after=(name=${event.after.name}, status=${event.after.status})"
         }
 
         val changeSummary = buildInfoUpdateChangeSummary(event)
@@ -143,15 +143,17 @@ class StoreAuditRecorder(
      */
     private fun buildInfoUpdateMetadata(event: StoreInfoUpdatedEvent): Map<String, Any> =
         mapOf(
-            "before" to mapOf(
-                "name" to event.before.name,
-                "description" to (event.before.description ?: ""),
-                "status" to event.before.status.name,
-            ),
-            "after" to mapOf(
-                "name" to event.after.name,
-                "description" to (event.after.description ?: ""),
-                "status" to event.after.status.name,
-            ),
+            "before" to
+                mapOf(
+                    "name" to event.before.name,
+                    "description" to (event.before.description ?: ""),
+                    "status" to event.before.status.name,
+                ),
+            "after" to
+                mapOf(
+                    "name" to event.after.name,
+                    "description" to (event.after.description ?: ""),
+                    "status" to event.after.status.name,
+                ),
         )
 }

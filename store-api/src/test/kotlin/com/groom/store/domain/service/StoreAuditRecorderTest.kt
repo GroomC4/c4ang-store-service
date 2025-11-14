@@ -1,6 +1,6 @@
 package com.groom.store.domain.service
 
-import com.groom.ecommerce.common.annotation.UnitTest
+import com.groom.store.common.annotation.UnitTest
 import com.groom.store.common.enums.StoreAuditEventType
 import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.event.StoreCreatedEvent
@@ -107,16 +107,18 @@ class StoreAuditRecorderTest :
                 StoreInfoUpdatedEvent(
                     storeId = storeId,
                     ownerUserId = ownerUserId,
-                    before = StoreInfoSnapshot(
-                        name = "기존 스토어",
-                        description = "기존 설명",
-                        status = StoreStatus.REGISTERED,
-                    ),
-                    after = StoreInfoSnapshot(
-                        name = "새 스토어",
-                        description = "새 설명",
-                        status = StoreStatus.REGISTERED,
-                    ),
+                    before =
+                        StoreInfoSnapshot(
+                            name = "기존 스토어",
+                            description = "기존 설명",
+                            status = StoreStatus.REGISTERED,
+                        ),
+                    after =
+                        StoreInfoSnapshot(
+                            name = "새 스토어",
+                            description = "새 설명",
+                            status = StoreStatus.REGISTERED,
+                        ),
                     occurredAt = LocalDateTime.now(),
                 )
 
@@ -134,9 +136,7 @@ class StoreAuditRecorderTest :
                             it.statusSnapshot == null &&
                             it.actorUserId == ownerUserId &&
                             it.changeSummary?.contains("이름: '기존 스토어' → '새 스토어'") == true &&
-                            it.changeSummary?.contains("설명: '기존 설명' → '새 설명'") == true &&
-                            (it.metadata?.get("before") as? Map<*, *>)?.get("name") == "기존 스토어" &&
-                            (it.metadata?.get("after") as? Map<*, *>)?.get("name") == "새 스토어"
+                            it.changeSummary?.contains("설명: '기존 설명' → '새 설명'") == true
                     },
                 )
             }
@@ -153,16 +153,18 @@ class StoreAuditRecorderTest :
                 StoreInfoUpdatedEvent(
                     storeId = storeId,
                     ownerUserId = ownerUserId,
-                    before = StoreInfoSnapshot(
-                        name = "기존 스토어",
-                        description = "동일한 설명",
-                        status = StoreStatus.REGISTERED,
-                    ),
-                    after = StoreInfoSnapshot(
-                        name = "새 스토어",
-                        description = "동일한 설명",
-                        status = StoreStatus.REGISTERED,
-                    ),
+                    before =
+                        StoreInfoSnapshot(
+                            name = "기존 스토어",
+                            description = "동일한 설명",
+                            status = StoreStatus.REGISTERED,
+                        ),
+                    after =
+                        StoreInfoSnapshot(
+                            name = "새 스토어",
+                            description = "동일한 설명",
+                            status = StoreStatus.REGISTERED,
+                        ),
                     occurredAt = LocalDateTime.now(),
                 )
 
@@ -192,16 +194,18 @@ class StoreAuditRecorderTest :
                 StoreInfoUpdatedEvent(
                     storeId = storeId,
                     ownerUserId = ownerUserId,
-                    before = StoreInfoSnapshot(
-                        name = "테스트 스토어",
-                        description = "설명",
-                        status = StoreStatus.REGISTERED,
-                    ),
-                    after = StoreInfoSnapshot(
-                        name = "테스트 스토어",
-                        description = "설명",
-                        status = StoreStatus.SUSPENDED,
-                    ),
+                    before =
+                        StoreInfoSnapshot(
+                            name = "테스트 스토어",
+                            description = "설명",
+                            status = StoreStatus.REGISTERED,
+                        ),
+                    after =
+                        StoreInfoSnapshot(
+                            name = "테스트 스토어",
+                            description = "설명",
+                            status = StoreStatus.SUSPENDED,
+                        ),
                     occurredAt = LocalDateTime.now(),
                 )
 

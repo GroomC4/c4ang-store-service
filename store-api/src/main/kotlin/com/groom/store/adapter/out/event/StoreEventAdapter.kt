@@ -1,11 +1,11 @@
 package com.groom.store.adapter.out.event
 
+import com.groom.ecommerce.store.event.avro.StoreInfoUpdated
 import com.groom.store.configuration.kafka.KafkaProperties
 import com.groom.store.domain.event.StoreCreatedEvent
 import com.groom.store.domain.event.StoreDeletedEvent
 import com.groom.store.domain.event.StoreInfoUpdatedEvent
 import com.groom.store.domain.port.PublishEventPort
-import com.groom.ecommerce.store.event.avro.StoreInfoUpdated
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component
@@ -59,7 +59,7 @@ class StoreEventAdapter(
 
         logger.info {
             "Publishing store.info.updated event: eventId=${avroEvent.eventId}, " +
-            "storeId=${event.storeId}, updatedFields=$updatedFields"
+                "storeId=${event.storeId}, updatedFields=$updatedFields"
         }
 
         kafkaTemplate.send(topic, partitionKey, avroEvent).apply {

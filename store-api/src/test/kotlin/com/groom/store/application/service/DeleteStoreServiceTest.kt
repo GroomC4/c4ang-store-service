@@ -1,14 +1,15 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.common.annotation.UnitTest
-import com.groom.ecommerce.common.domain.DomainEventPublisher
-import com.groom.ecommerce.common.exception.StoreException
 import com.groom.store.application.dto.DeleteStoreCommand
+import com.groom.store.common.annotation.UnitTest
 import com.groom.store.common.enums.StoreStatus
+import com.groom.store.common.exception.StoreException
 import com.groom.store.domain.model.Store
+import com.groom.store.domain.port.LoadStorePort
+import com.groom.store.domain.port.PublishEventPort
+import com.groom.store.domain.port.SaveStorePort
 import com.groom.store.domain.service.StoreManager
 import com.groom.store.fixture.StoreTestFixture
-import com.groom.store.outbound.repository.StoreRepositoryImpl
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -28,15 +29,17 @@ class DeleteStoreServiceTest :
         isolationMode = IsolationMode.InstancePerLeaf
 
         Given("스토어 소유자가 자신의 스토어를 삭제하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val loadStorePort = mockk<LoadStorePort>()
+            val saveStorePort = mockk<SaveStorePort>()
+            val publishEventPort = mockk<PublishEventPort>()
             val storeManager = mockk<StoreManager>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
 
             val deleteStoreService =
                 DeleteStoreService(
-                    storeRepository = storeRepository,
+                    loadStorePort = loadStorePort,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                     storeManager = storeManager,
-                    domainEventPublisher = domainEventPublisher,
                 )
 
             val storeId = UUID.randomUUID()
@@ -56,12 +59,12 @@ class DeleteStoreServiceTest :
                     status = StoreStatus.REGISTERED,
                 )
 
-            every { storeRepository.findById(storeId) } returns Optional.of(existingStore)
+            every { loadStorePort.loadById(storeId) } returns existingStore
             every { storeManager.deleteStore(existingStore, userId) } answers {
                 existingStore.delete() // 불변 객체 패턴: DeleteResult 반환
             }
-            every { storeRepository.save(any<Store>()) } answers { firstArg() } // 불변 객체 패턴: 저장된 Store 반환
-            every { domainEventPublisher.publish(any()) } just runs
+            every { saveStorePort.save(any<Store>()) } answers { firstArg() } // 불변 객체 패턴: 저장된 Store 반환
+            every { publishEventPort.publishStoreDeleted(any()) } just runs
 
             When("스토어를 삭제하면") {
                 val result = deleteStoreService.delete(command)
@@ -77,15 +80,17 @@ class DeleteStoreServiceTest :
         }
 
         Given("존재하지 않는 스토어를 삭제하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val loadStorePort = mockk<LoadStorePort>()
+            val saveStorePort = mockk<SaveStorePort>()
+            val publishEventPort = mockk<PublishEventPort>()
             val storeManager = mockk<StoreManager>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
 
             val deleteStoreService =
                 DeleteStoreService(
-                    storeRepository = storeRepository,
+                    loadStorePort = loadStorePort,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                     storeManager = storeManager,
-                    domainEventPublisher = domainEventPublisher,
                 )
 
             val storeId = UUID.randomUUID()
@@ -96,7 +101,7 @@ class DeleteStoreServiceTest :
                     userId = userId,
                 )
 
-            every { storeRepository.findById(storeId) } returns Optional.empty()
+            every { loadStorePort.loadById(storeId) } returns null
 
             When("스토어를 삭제하려고 하면") {
                 Then("StoreException.StoreNotFound 예외가 발생한다") {
@@ -111,15 +116,17 @@ class DeleteStoreServiceTest :
         }
 
         Given("스토어 소유자가 아닌 사용자가 스토어를 삭제하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val loadStorePort = mockk<LoadStorePort>()
+            val saveStorePort = mockk<SaveStorePort>()
+            val publishEventPort = mockk<PublishEventPort>()
             val storeManager = mockk<StoreManager>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
 
             val deleteStoreService =
                 DeleteStoreService(
-                    storeRepository = storeRepository,
+                    loadStorePort = loadStorePort,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                     storeManager = storeManager,
-                    domainEventPublisher = domainEventPublisher,
                 )
 
             val storeId = UUID.randomUUID()
@@ -140,7 +147,7 @@ class DeleteStoreServiceTest :
                     status = StoreStatus.REGISTERED,
                 )
 
-            every { storeRepository.findById(storeId) } returns Optional.of(existingStore)
+            every { loadStorePort.loadById(storeId) } returns existingStore
             every { storeManager.deleteStore(existingStore, userId) } throws
                 StoreException.StoreAccessDenied(storeId, userId)
 
@@ -158,15 +165,17 @@ class DeleteStoreServiceTest :
         }
 
         Given("이미 삭제된 스토어를 다시 삭제하려고 할 때") {
-            val storeRepository = mockk<StoreRepositoryImpl>()
+            val loadStorePort = mockk<LoadStorePort>()
+            val saveStorePort = mockk<SaveStorePort>()
+            val publishEventPort = mockk<PublishEventPort>()
             val storeManager = mockk<StoreManager>()
-            val domainEventPublisher = mockk<DomainEventPublisher>()
 
             val deleteStoreService =
                 DeleteStoreService(
-                    storeRepository = storeRepository,
+                    loadStorePort = loadStorePort,
+                    saveStorePort = saveStorePort,
+                    publishEventPort = publishEventPort,
                     storeManager = storeManager,
-                    domainEventPublisher = domainEventPublisher,
                 )
 
             val storeId = UUID.randomUUID()
@@ -186,7 +195,7 @@ class DeleteStoreServiceTest :
                         StoreTestFixture.setField(this, "id", storeId)
                     }
 
-            every { storeRepository.findById(storeId) } returns Optional.of(deletedStore)
+            every { loadStorePort.loadById(storeId) } returns deletedStore
             every { storeManager.deleteStore(deletedStore, userId) } answers {
                 deletedStore.delete()
             }
