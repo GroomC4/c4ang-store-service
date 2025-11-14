@@ -1,6 +1,6 @@
 package com.groom.store.adapter.out.persistence
 
-import com.groom.ecommerce.store.domain.model.StoreAudit
+import com.groom.store.domain.model.StoreAudit
 import com.groom.store.domain.port.SaveStoreAuditPort
 import com.groom.store.outbound.repository.StoreAuditRepositoryImpl
 import org.springframework.stereotype.Component

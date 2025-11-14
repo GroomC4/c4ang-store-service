@@ -16,6 +16,11 @@ class UserServiceAdapter(
 ) : LoadUserPort {
 
     override fun loadById(userId: UUID): UserInfo {
-        return userServiceClient.get(userId)
+        val response = userServiceClient.get(userId)
+        return UserInfo(
+            id = response.id,
+            name = response.name,
+            role = response.role,
+        )
     }
 }
