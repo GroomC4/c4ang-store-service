@@ -6,6 +6,7 @@ import com.groom.ecommerce.store.domain.event.StoreCreatedEvent
 import com.groom.ecommerce.store.domain.event.StoreInfoUpdatedEvent
 import com.groom.ecommerce.store.domain.model.StoreAudit
 import com.groom.store.domain.event.StoreDeletedEvent
+import com.groom.store.domain.port.SaveStoreAuditPort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class StoreAuditRecorder(
-    private val storeAuditWriter: StoreAuditWriter,
+    private val saveStoreAuditPort: SaveStoreAuditPort,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -50,7 +51,7 @@ class StoreAuditRecorder(
                 metadata = metadata,
             )
 
-        storeAuditWriter.save(audit)
+        saveStoreAuditPort.save(audit)
         logger.info { "StoreAudit saved: id=${audit.id}, storeId=${event.storeId}, eventType=REGISTERED" }
     }
 
@@ -76,7 +77,7 @@ class StoreAuditRecorder(
                 metadata = metadata,
             )
 
-        storeAuditWriter.save(audit)
+        saveStoreAuditPort.save(audit)
         logger.info { "StoreAudit saved: id=${audit.id}, storeId=${event.storeId}, eventType=INFO_UPDATED" }
     }
 
@@ -106,7 +107,7 @@ class StoreAuditRecorder(
                 metadata = metadata,
             )
 
-        storeAuditWriter.save(audit)
+        saveStoreAuditPort.save(audit)
         logger.info { "StoreAudit saved: id=${audit.id}, storeId=${event.storeId}, eventType=DELETED" }
     }
 

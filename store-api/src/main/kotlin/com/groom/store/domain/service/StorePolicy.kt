@@ -2,6 +2,7 @@ package com.groom.store.domain.service
 
 import com.groom.ecommerce.store.common.enums.StoreStatus
 import com.groom.store.common.exception.StoreException
+import com.groom.store.domain.port.LoadStorePort
 import org.springframework.stereotype.Component
 import java.util.UUID
 
@@ -10,7 +11,7 @@ import java.util.UUID
  */
 @Component
 class StorePolicy(
-    private val storeReader: StoreReader,
+    private val loadStorePort: LoadStorePort,
 ) {
     /**
      * 사용자가 이미 스토어를 보유하고 있는지 확인한다.
@@ -20,7 +21,7 @@ class StorePolicy(
      * @throws StoreException.DuplicateStore 이미 스토어를 보유한 경우
      */
     fun checkStoreAlreadyExists(ownerUserId: UUID) {
-        if (storeReader.existsByOwnerUserId(ownerUserId)) {
+        if (loadStorePort.existsByOwnerUserId(ownerUserId)) {
             throw StoreException.DuplicateStore(ownerUserId)
         }
     }
@@ -33,10 +34,8 @@ class StorePolicy(
      * @throws StoreException.StoreAlreadyDeleted 이미 삭제된 스토어인 경우
      */
     fun checkStoreDeletable(storeId: UUID) {
-        val store =
-            storeReader
-                .findById(storeId)
-                .orElseThrow { StoreException.StoreNotFound(storeId) }
+        val store = loadStorePort.loadById(storeId)
+            ?: throw StoreException.StoreNotFound(storeId)
 
         if (store.status == StoreStatus.DELETED) {
             throw StoreException.StoreAlreadyDeleted(storeId)
@@ -54,10 +53,8 @@ class StorePolicy(
         storeId: UUID,
         userId: UUID,
     ) {
-        val store =
-            storeReader
-                .findById(storeId)
-                .orElseThrow { StoreException.StoreNotFound(storeId) }
+        val store = loadStorePort.loadById(storeId)
+            ?: throw StoreException.StoreNotFound(storeId)
 
         if (store.ownerUserId != userId) {
             throw StoreException.StoreAccessDenied(storeId, userId)
@@ -71,8 +68,7 @@ class StorePolicy(
      * @throws StoreException.StoreNotFound 스토어를 찾을 수 없는 경우
      */
     fun checkStoreExists(storeId: UUID) {
-        storeReader
-            .findById(storeId)
-            .orElseThrow { StoreException.StoreNotFound(storeId) }
+        loadStorePort.loadById(storeId)
+            ?: throw StoreException.StoreNotFound(storeId)
     }
 }
