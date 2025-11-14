@@ -3,7 +3,7 @@ package com.groom.store.application.service
 import com.groom.ecommerce.store.application.dto.GetStoreQuery
 import com.groom.ecommerce.store.application.dto.GetStoreResult
 import com.groom.store.common.exception.StoreException
-import com.groom.store.domain.service.StoreReader
+import com.groom.store.domain.port.LoadStorePort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -14,7 +14,7 @@ import java.util.UUID
  */
 @Service
 class GetStoreService(
-    private val reader: StoreReader,
+    private val loadStorePort: LoadStorePort,
 ) {
     /**
      * 스토어 상세 정보를 조회한다.
@@ -25,10 +25,8 @@ class GetStoreService(
      */
     @Transactional(readOnly = true)
     fun getStore(query: GetStoreQuery): GetStoreResult {
-        val store =
-            reader
-                .findById(query.storeId)
-                .orElseThrow { StoreException.StoreNotFound(query.storeId) }
+        val store = loadStorePort.loadById(query.storeId)
+            ?: throw StoreException.StoreNotFound(query.storeId)
 
         return GetStoreResult.from(store)
     }
@@ -42,10 +40,8 @@ class GetStoreService(
      */
     @Transactional(readOnly = true)
     fun getMyStore(userId: UUID): GetStoreResult {
-        val store =
-            reader
-                .findByOwnerUserId(userId)
-                .orElseThrow { StoreException.StoreNotFound(userId) }
+        val store = loadStorePort.loadByOwnerUserId(userId)
+            ?: throw StoreException.StoreNotFound(userId)
 
         return GetStoreResult.from(store)
     }

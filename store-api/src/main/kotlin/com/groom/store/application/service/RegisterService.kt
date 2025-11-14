@@ -2,10 +2,10 @@ package com.groom.store.application.service
 
 import com.groom.ecommerce.store.application.dto.RegisterStoreCommand
 import com.groom.ecommerce.store.application.dto.RegisterStoreResult
-import com.groom.store.common.domain.DomainEventPublisher
+import com.groom.store.domain.port.PublishEventPort
+import com.groom.store.domain.port.SaveStorePort
 import com.groom.store.domain.service.SellerPolicy
 import com.groom.store.domain.service.StoreFactory
-import com.groom.store.domain.service.StoreWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 class RegisterService(
     private val sellerPolicy: SellerPolicy,
     private val storeFactory: StoreFactory,
-    private val storeWriter: StoreWriter,
-    private val domainEventPublisher: DomainEventPublisher,
+    private val saveStorePort: SaveStorePort,
+    private val publishEventPort: PublishEventPort,
 ) {
     /**
      * 스토어를 등록한다.
@@ -40,11 +40,11 @@ class RegisterService(
                     ownerUserId = command.ownerUserId,
                     name = command.name,
                     description = command.description,
-                ).let(storeWriter::save)
+                ).let { saveStorePort.save(it) }
 
         // 스토어 생성 이벤트 발행
         val event = newStore.publishCreatedEvent()
-        domainEventPublisher.publish(event)
+        publishEventPort.publishStoreCreated(event)
 
         return RegisterStoreResult(
             storeId = newStore.id.toString(),

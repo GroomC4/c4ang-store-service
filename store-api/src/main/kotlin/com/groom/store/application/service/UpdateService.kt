@@ -2,10 +2,11 @@ package com.groom.store.application.service
 
 import com.groom.ecommerce.store.application.dto.UpdateStoreCommand
 import com.groom.ecommerce.store.application.dto.UpdateStoreResult
-import com.groom.store.common.domain.DomainEventPublisher
 import com.groom.store.common.exception.StoreException
+import com.groom.store.domain.port.LoadStorePort
+import com.groom.store.domain.port.PublishEventPort
+import com.groom.store.domain.port.SaveStorePort
 import com.groom.store.domain.service.StorePolicy
-import com.groom.store.outbound.repository.StoreRepositoryImpl
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,9 +16,10 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class UpdateService(
-    private val storeRepository: StoreRepositoryImpl,
+    private val loadStorePort: LoadStorePort,
+    private val saveStorePort: SaveStorePort,
+    private val publishEventPort: PublishEventPort,
     private val storePolicy: StorePolicy,
-    private val domainEventPublisher: DomainEventPublisher,
 ) {
     /**
      * 스토어 정보를 수정한다.
@@ -33,10 +35,8 @@ class UpdateService(
         storePolicy.checkStoreAccess(command.storeId, command.userId)
 
         // 스토어 조회
-        val store =
-            storeRepository
-                .findById(command.storeId)
-                .orElseThrow { StoreException.StoreNotFound(command.storeId) }
+        val store = loadStorePort.loadById(command.storeId)
+            ?: throw StoreException.StoreNotFound(command.storeId)
 
         // 스토어 정보 수정 (불변 객체이므로 새 인스턴스 반환)
         val updateResult =
@@ -46,11 +46,11 @@ class UpdateService(
             )
 
         // 새 Store 인스턴스 저장 (불변 객체 패턴)
-        val savedStore = storeRepository.save(updateResult.updatedStore)
+        val savedStore = saveStorePort.save(updateResult.updatedStore)
 
         // 도메인 이벤트 발행 (변경사항이 있는 경우에만)
         updateResult.event
-            ?.let(domainEventPublisher::publish)
+            ?.let { publishEventPort.publishStoreInfoUpdated(it) }
 
         return UpdateStoreResult(
             storeId = savedStore.id.toString(),
