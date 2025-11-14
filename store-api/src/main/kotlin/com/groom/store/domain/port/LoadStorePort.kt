@@ -1,6 +1,6 @@
 package com.groom.store.domain.port
 
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.model.Store
 import java.util.UUID
 

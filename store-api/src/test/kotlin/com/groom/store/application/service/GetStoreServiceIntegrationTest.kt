@@ -2,9 +2,9 @@ package com.groom.store.application.service
 
 import com.groom.ecommerce.common.TransactionApplier
 import com.groom.ecommerce.common.exception.StoreException
-import com.groom.ecommerce.store.application.dto.GetStoreQuery
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.application.dto.GetStoreQuery
 import com.groom.store.common.annotation.IntegrationTest
+import com.groom.store.common.enums.StoreStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

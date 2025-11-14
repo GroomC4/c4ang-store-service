@@ -1,7 +1,7 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.store.application.dto.RegisterStoreCommand
-import com.groom.ecommerce.store.application.dto.RegisterStoreResult
+import com.groom.store.application.dto.RegisterStoreCommand
+import com.groom.store.application.dto.RegisterStoreResult
 import com.groom.store.domain.port.PublishEventPort
 import com.groom.store.domain.port.SaveStorePort
 import com.groom.store.domain.service.SellerPolicy

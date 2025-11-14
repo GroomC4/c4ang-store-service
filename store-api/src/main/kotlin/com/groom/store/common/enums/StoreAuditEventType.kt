@@ -1,4 +1,4 @@
-package com.groom.ecommerce.store.common.enums
+package com.groom.store.common.enums
 
 /**
  * 스토어 감사 이벤트 타입

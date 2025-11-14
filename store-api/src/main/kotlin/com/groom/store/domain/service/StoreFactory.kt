@@ -1,6 +1,6 @@
 package com.groom.store.domain.service
 
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.model.Store
 import com.groom.store.domain.model.StoreRating
 import org.springframework.stereotype.Component

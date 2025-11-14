@@ -1,6 +1,6 @@
-package com.groom.ecommerce.store.presentation.web.dto
+package com.groom.store.adapter.inbound.web.dto
 
-import com.groom.ecommerce.store.application.dto.UpdateStoreCommand
+import com.groom.store.application.dto.UpdateStoreCommand
 import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 

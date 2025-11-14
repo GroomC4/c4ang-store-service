@@ -1,4 +1,4 @@
-package com.groom.ecommerce.store.infrastructure.repository
+package com.groom.store.outbound.repository
 
 import com.groom.store.domain.model.StoreRating
 import org.springframework.data.jpa.repository.JpaRepository

@@ -1,7 +1,7 @@
 package com.groom.store.domain.model
 
-import com.groom.ecommerce.store.common.enums.StoreAuditEventType
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreAuditEventType
+import com.groom.store.common.enums.StoreStatus
 import io.hypersistence.utils.hibernate.type.json.JsonType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

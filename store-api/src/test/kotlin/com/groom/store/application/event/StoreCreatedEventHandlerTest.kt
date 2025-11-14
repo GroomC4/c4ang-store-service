@@ -1,8 +1,8 @@
 package com.groom.store.application.event
 
-import com.groom.ecommerce.store.application.event.StoreCreatedEventHandler
-import com.groom.ecommerce.store.domain.event.StoreCreatedEvent
-import com.groom.ecommerce.store.domain.service.StoreAuditRecorder
+import com.groom.store.application.event.StoreCreatedEventHandler
+import com.groom.store.domain.event.StoreCreatedEvent
+import com.groom.store.domain.service.StoreAuditRecorder
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.just

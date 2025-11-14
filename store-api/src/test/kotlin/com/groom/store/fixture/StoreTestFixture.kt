@@ -1,6 +1,6 @@
 package com.groom.store.fixture
 
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.model.Store
 import com.groom.store.domain.model.StoreRating
 import java.math.BigDecimal

@@ -1,7 +1,7 @@
-package com.groom.ecommerce.store.presentation.web.dto
+package com.groom.store.adapter.inbound.web.dto
 
-import com.groom.ecommerce.store.application.dto.GetStoreResult
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.application.dto.GetStoreResult
+import com.groom.store.common.enums.StoreStatus
 import io.swagger.v3.oas.annotations.media.Schema
 import java.math.BigDecimal
 import java.time.LocalDateTime

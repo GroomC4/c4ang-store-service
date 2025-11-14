@@ -1,6 +1,6 @@
-package com.groom.ecommerce.store.presentation.web.dto
+package com.groom.store.adapter.inbound.web.dto
 
-import com.groom.ecommerce.store.application.dto.UpdateStoreResult
+import com.groom.store.application.dto.UpdateStoreResult
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 

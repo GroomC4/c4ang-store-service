@@ -1,6 +1,6 @@
 package com.groom.store.adapter.out.persistence
 
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.model.Store
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID

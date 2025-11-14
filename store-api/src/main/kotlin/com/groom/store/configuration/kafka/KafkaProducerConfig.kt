@@ -22,20 +22,21 @@ class KafkaProducerConfig(
 ) {
     @Bean
     fun producerFactory(): ProducerFactory<String, Any> {
-        val configProps = mutableMapOf<String, Any>(
-            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaProperties.bootstrapServers,
-            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
-            ProducerConfig.ACKS_CONFIG to kafkaProperties.producer.acks,
-            ProducerConfig.RETRIES_CONFIG to kafkaProperties.producer.retries,
-            ProducerConfig.BATCH_SIZE_CONFIG to kafkaProperties.producer.batchSize,
-            ProducerConfig.LINGER_MS_CONFIG to kafkaProperties.producer.lingerMs,
-            ProducerConfig.BUFFER_MEMORY_CONFIG to kafkaProperties.producer.bufferMemory,
-            ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to kafkaProperties.producer.maxInFlightRequestsPerConnection,
-            ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to kafkaProperties.producer.enableIdempotence,
-            ProducerConfig.COMPRESSION_TYPE_CONFIG to kafkaProperties.producer.compressionType,
-            KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG to kafkaProperties.schemaRegistry.url,
-        )
+        val configProps =
+            mutableMapOf<String, Any>(
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaProperties.bootstrapServers,
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
+                ProducerConfig.ACKS_CONFIG to kafkaProperties.producer.acks,
+                ProducerConfig.RETRIES_CONFIG to kafkaProperties.producer.retries,
+                ProducerConfig.BATCH_SIZE_CONFIG to kafkaProperties.producer.batchSize,
+                ProducerConfig.LINGER_MS_CONFIG to kafkaProperties.producer.lingerMs,
+                ProducerConfig.BUFFER_MEMORY_CONFIG to kafkaProperties.producer.bufferMemory,
+                ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to kafkaProperties.producer.maxInFlightRequestsPerConnection,
+                ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to kafkaProperties.producer.enableIdempotence,
+                ProducerConfig.COMPRESSION_TYPE_CONFIG to kafkaProperties.producer.compressionType,
+                KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG to kafkaProperties.schemaRegistry.url,
+            )
 
         return DefaultKafkaProducerFactory(configProps)
     }

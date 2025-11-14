@@ -3,9 +3,9 @@ package com.groom.store.domain.service
 import com.groom.store.common.enums.StoreAuditEventType
 import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.event.StoreCreatedEvent
+import com.groom.store.domain.event.StoreDeletedEvent
 import com.groom.store.domain.event.StoreInfoUpdatedEvent
 import com.groom.store.domain.model.StoreAudit
-import com.groom.store.domain.event.StoreDeletedEvent
 import com.groom.store.domain.port.SaveStoreAuditPort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component

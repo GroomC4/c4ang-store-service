@@ -13,8 +13,5 @@ import org.springframework.stereotype.Component
 class StoreAuditPersistenceAdapter(
     private val storeAuditRepository: StoreAuditRepositoryImpl,
 ) : SaveStoreAuditPort {
-
-    override fun save(audit: StoreAudit): StoreAudit {
-        return storeAuditRepository.save(audit)
-    }
+    override fun save(audit: StoreAudit): StoreAudit = storeAuditRepository.save(audit)
 }

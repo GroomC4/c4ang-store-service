@@ -1,7 +1,7 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.store.application.dto.UpdateStoreCommand
-import com.groom.ecommerce.store.application.dto.UpdateStoreResult
+import com.groom.store.application.dto.UpdateStoreCommand
+import com.groom.store.application.dto.UpdateStoreResult
 import com.groom.store.common.exception.StoreException
 import com.groom.store.domain.port.LoadStorePort
 import com.groom.store.domain.port.PublishEventPort
@@ -35,8 +35,9 @@ class UpdateService(
         storePolicy.checkStoreAccess(command.storeId, command.userId)
 
         // 스토어 조회
-        val store = loadStorePort.loadById(command.storeId)
-            ?: throw StoreException.StoreNotFound(command.storeId)
+        val store =
+            loadStorePort.loadById(command.storeId)
+                ?: throw StoreException.StoreNotFound(command.storeId)
 
         // 스토어 정보 수정 (불변 객체이므로 새 인스턴스 반환)
         val updateResult =

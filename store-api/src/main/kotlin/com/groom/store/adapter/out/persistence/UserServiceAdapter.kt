@@ -14,7 +14,6 @@ import java.util.UUID
 class UserServiceAdapter(
     private val userServiceClient: UserServiceClient,
 ) : LoadUserPort {
-
     override fun loadById(userId: UUID): UserInfo {
         val response = userServiceClient.get(userId)
         return UserInfo(

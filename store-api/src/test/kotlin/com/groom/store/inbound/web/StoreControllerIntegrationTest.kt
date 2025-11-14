@@ -1,10 +1,10 @@
 package com.groom.store.inbound.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.groom.ecommerce.store.presentation.web.dto.RegisterStoreRequest
 import com.groom.store.common.TransactionApplier
 import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.outbound.repository.StoreRepositoryImpl
+import com.groom.store.presentation.web.dto.RegisterStoreRequest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

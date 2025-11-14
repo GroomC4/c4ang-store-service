@@ -2,7 +2,7 @@ package com.groom.store.domain.service
 
 import com.groom.ecommerce.common.annotation.UnitTest
 import com.groom.ecommerce.common.exception.StoreException
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.service.StoreFactory
 import com.groom.store.domain.service.StorePolicy
 import io.kotest.assertions.throwables.shouldThrow

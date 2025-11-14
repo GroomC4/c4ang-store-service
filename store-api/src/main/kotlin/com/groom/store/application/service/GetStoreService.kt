@@ -1,7 +1,7 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.store.application.dto.GetStoreQuery
-import com.groom.ecommerce.store.application.dto.GetStoreResult
+import com.groom.store.application.dto.GetStoreQuery
+import com.groom.store.application.dto.GetStoreResult
 import com.groom.store.common.exception.StoreException
 import com.groom.store.domain.port.LoadStorePort
 import org.springframework.stereotype.Service
@@ -25,8 +25,9 @@ class GetStoreService(
      */
     @Transactional(readOnly = true)
     fun getStore(query: GetStoreQuery): GetStoreResult {
-        val store = loadStorePort.loadById(query.storeId)
-            ?: throw StoreException.StoreNotFound(query.storeId)
+        val store =
+            loadStorePort.loadById(query.storeId)
+                ?: throw StoreException.StoreNotFound(query.storeId)
 
         return GetStoreResult.from(store)
     }
@@ -40,8 +41,9 @@ class GetStoreService(
      */
     @Transactional(readOnly = true)
     fun getMyStore(userId: UUID): GetStoreResult {
-        val store = loadStorePort.loadByOwnerUserId(userId)
-            ?: throw StoreException.StoreNotFound(userId)
+        val store =
+            loadStorePort.loadByOwnerUserId(userId)
+                ?: throw StoreException.StoreNotFound(userId)
 
         return GetStoreResult.from(store)
     }

@@ -1,4 +1,4 @@
-package com.groom.ecommerce.store.common.enums
+package com.groom.store.common.enums
 
 /**
  * 스토어 상태

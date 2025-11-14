@@ -1,6 +1,6 @@
-package com.groom.ecommerce.store.application.dto
+package com.groom.store.application.dto
 
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.model.Store
 import java.math.BigDecimal
 import java.time.LocalDateTime

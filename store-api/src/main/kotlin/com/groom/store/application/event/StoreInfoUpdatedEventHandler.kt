@@ -1,6 +1,5 @@
 package com.groom.store.application.event
 
-import com.groom.ecommerce.product.infrastructure.repository.ProductRepositoryImpl
 import com.groom.store.domain.event.StoreInfoUpdatedEvent
 import com.groom.store.domain.service.StoreAuditRecorder
 import org.slf4j.LoggerFactory
@@ -23,7 +22,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 @Component
 class StoreInfoUpdatedEventHandler(
     private val storeAuditRecorder: StoreAuditRecorder,
-    private val productRepository: ProductRepositoryImpl,
+    private val storeEnventPublisher: StoreEventPublisher,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -43,31 +42,5 @@ class StoreInfoUpdatedEventHandler(
         if (event.oldName != event.newName) {
             updateProductStoreName(event)
         }
-    }
-
-    /**
-     * p_product 테이블의 store_name 비정규화 컬럼을 일괄 업데이트합니다.
-     *
-     * 성능 최적화:
-     * - JPQL bulk update 사용으로 한 번의 쿼리로 모든 상품 업데이트
-     * - N+1 문제 없이 효율적인 처리
-     * - 대량 데이터에도 안정적인 성능
-     *
-     * @param event 스토어 정보 수정 이벤트
-     */
-    private fun updateProductStoreName(event: StoreInfoUpdatedEvent) {
-        val updatedCount =
-            productRepository.bulkUpdateStoreName(
-                storeId = event.storeId,
-                newStoreName = event.newName,
-            )
-
-        log.info(
-            "Store name updated from '{}' to '{}' for storeId={}. Updated {} products.",
-            event.oldName,
-            event.newName,
-            event.storeId,
-            updatedCount,
-        )
     }
 }

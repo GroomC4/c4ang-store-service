@@ -1,4 +1,4 @@
-package com.groom.ecommerce.store.application.dto
+package com.groom.store.application.dto
 
 import java.util.UUID
 

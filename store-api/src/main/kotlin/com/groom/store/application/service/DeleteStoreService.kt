@@ -1,7 +1,7 @@
 package com.groom.store.application.service
 
-import com.groom.ecommerce.store.application.dto.DeleteStoreCommand
-import com.groom.ecommerce.store.application.dto.DeleteStoreResult
+import com.groom.store.application.dto.DeleteStoreCommand
+import com.groom.store.application.dto.DeleteStoreResult
 import com.groom.store.common.exception.StoreException
 import com.groom.store.domain.port.LoadStorePort
 import com.groom.store.domain.port.PublishEventPort
@@ -33,8 +33,9 @@ class DeleteStoreService(
     @Transactional
     fun delete(command: DeleteStoreCommand): DeleteStoreResult {
         // 스토어 조회
-        val store = loadStorePort.loadById(command.storeId)
-            ?: throw StoreException.StoreNotFound(command.storeId)
+        val store =
+            loadStorePort.loadById(command.storeId)
+                ?: throw StoreException.StoreNotFound(command.storeId)
 
         // 도메인 서비스를 통한 스토어 삭제 (비즈니스 규칙 검증 포함, 불변 객체 패턴)
         val deleteResult = storeManager.deleteStore(store, command.userId)

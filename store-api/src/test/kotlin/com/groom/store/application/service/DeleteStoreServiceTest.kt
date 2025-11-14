@@ -3,11 +3,11 @@ package com.groom.store.application.service
 import com.groom.ecommerce.common.annotation.UnitTest
 import com.groom.ecommerce.common.domain.DomainEventPublisher
 import com.groom.ecommerce.common.exception.StoreException
-import com.groom.ecommerce.store.application.dto.DeleteStoreCommand
-import com.groom.ecommerce.store.common.enums.StoreStatus
-import com.groom.ecommerce.store.domain.service.StoreManager
-import com.groom.ecommerce.store.fixture.StoreTestFixture
+import com.groom.store.application.dto.DeleteStoreCommand
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.model.Store
+import com.groom.store.domain.service.StoreManager
+import com.groom.store.fixture.StoreTestFixture
 import com.groom.store.outbound.repository.StoreRepositoryImpl
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode

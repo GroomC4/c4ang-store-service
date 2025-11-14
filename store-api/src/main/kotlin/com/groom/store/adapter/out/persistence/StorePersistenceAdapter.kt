@@ -1,6 +1,6 @@
 package com.groom.store.adapter.out.persistence
 
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.model.Store
 import com.groom.store.domain.port.LoadStorePort
 import com.groom.store.domain.port.SaveStorePort

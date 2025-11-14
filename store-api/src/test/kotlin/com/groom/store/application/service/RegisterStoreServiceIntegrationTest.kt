@@ -3,12 +3,12 @@ package com.groom.store.application.service
 import com.groom.ecommerce.common.TransactionApplier
 import com.groom.ecommerce.common.exception.StoreException
 import com.groom.ecommerce.common.exception.UserException
-import com.groom.ecommerce.store.application.dto.RegisterStoreCommand
-import com.groom.ecommerce.store.common.enums.StoreAuditEventType
-import com.groom.ecommerce.store.common.enums.StoreStatus
-import com.groom.ecommerce.store.infrastructure.repository.StoreAuditRepositoryImpl
+import com.groom.store.application.dto.RegisterStoreCommand
 import com.groom.store.application.service.RegisterService
 import com.groom.store.common.annotation.IntegrationTest
+import com.groom.store.common.enums.StoreAuditEventType
+import com.groom.store.common.enums.StoreStatus
+import com.groom.store.infrastructure.repository.StoreAuditRepositoryImpl
 import com.groom.store.outbound.repository.StoreRepositoryImpl
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

@@ -2,7 +2,7 @@ package com.groom.store.application.service
 
 import com.groom.ecommerce.common.TransactionApplier
 import com.groom.ecommerce.common.exception.StoreException
-import com.groom.ecommerce.store.application.dto.UpdateStoreCommand
+import com.groom.store.application.dto.UpdateStoreCommand
 import com.groom.store.application.service.UpdateService
 import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.outbound.repository.StoreRepositoryImpl

@@ -1,6 +1,6 @@
 package com.groom.store.domain.model
 
-import com.groom.ecommerce.store.common.enums.StoreStatus
+import com.groom.store.common.enums.StoreStatus
 import com.groom.store.common.exception.StoreException
 import com.groom.store.configuration.jpa.CreatedAndUpdatedAtAuditEntity
 import com.groom.store.domain.event.StoreCreatedEvent
