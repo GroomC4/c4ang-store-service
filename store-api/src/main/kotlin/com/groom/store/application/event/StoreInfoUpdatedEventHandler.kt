@@ -22,7 +22,6 @@ import org.springframework.transaction.event.TransactionalEventListener
 @Component
 class StoreInfoUpdatedEventHandler(
     private val storeAuditRecorder: StoreAuditRecorder,
-    private val storeEnventPublisher: StoreEventPublisher,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -38,9 +37,13 @@ class StoreInfoUpdatedEventHandler(
         // 1. 감사 로그 기록
         storeAuditRecorder.recordStoreInfoUpdated(event)
 
-        // 2. 스토어 이름이 변경된 경우 비정규화 컬럼 업데이트
-        if (event.oldName != event.newName) {
-            updateProductStoreName(event)
-        }
+        // TODO: Product 도메인 의존성 구현 후 활성화
+        // 2. 스토어 이름이 변경된 경우 p_product의 비정규화 컬럼(store_name) 일괄 업데이트
+        // if (event.oldName != event.newName) {
+        //     productRepository.bulkUpdateStoreName(
+        //         storeId = event.storeId,
+        //         newStoreName = event.newName,
+        //     )
+        // }
     }
 }

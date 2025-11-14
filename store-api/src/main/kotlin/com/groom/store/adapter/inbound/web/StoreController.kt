@@ -1,7 +1,8 @@
 package com.groom.store.adapter.inbound.web
 
-import com.groom.ecommerce.authorization.AuthenticationContext
 import com.groom.store.adapter.inbound.web.dto.GetStoreResponse
+import com.groom.store.common.util.IstioHeaderExtractor
+import jakarta.servlet.http.HttpServletRequest
 import com.groom.store.application.dto.DeleteStoreCommand
 import com.groom.store.application.dto.GetStoreQuery
 import com.groom.store.application.service.DeleteStoreService
@@ -18,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -41,15 +41,16 @@ class StoreController(
     private val updateService: UpdateService,
     private val deleteStoreService: DeleteStoreService,
     private val getStoreService: GetStoreService,
-    private val authenticationContext: AuthenticationContext,
+    private val istioHeaderExtractor: IstioHeaderExtractor,
 ) {
     /**
      * 스토어를 등록한다.
      * 인증된 Owner만 스토어를 등록할 수 있다.
      *
-     * Spring Security의 @PreAuthorize와 SecurityConfig에서 OWNER 역할을 검증하고,
+     * Istio API Gateway가 JWT 검증 후 X-User-Id 헤더로 사용자 ID를 주입하며,
      * 추가로 애플리케이션 계층(StorePolicy)에서 DB 기반 역할 검증을 수행한다.
      *
+     * @param httpRequest HTTP 요청 (Istio 헤더 추출용)
      * @param request 스토어 등록 요청
      * @return 등록된 스토어 정보
      */
@@ -62,13 +63,13 @@ class StoreController(
             ApiResponse(responseCode = "403", description = "권한 없음 (Owner 권한 필요)"),
         ],
     )
-    @PreAuthorize("hasRole('OWNER')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun registerStore(
+        httpRequest: HttpServletRequest,
         @RequestBody request: RegisterStoreRequest,
     ): RegisterStoreResponse {
-        val userId = authenticationContext.getCurrentUserId()
+        val userId = istioHeaderExtractor.extractUserId(httpRequest)
         val command = request.toCommand(userId)
         val result = registerService.register(command)
         return RegisterStoreResponse.from(result)
@@ -92,13 +93,13 @@ class StoreController(
             ApiResponse(responseCode = "404", description = "스토어를 찾을 수 없음"),
         ],
     )
-    @PreAuthorize("hasRole('OWNER')")
     @PatchMapping("/{storeId}")
     fun updateStore(
+        httpRequest: HttpServletRequest,
         @PathVariable storeId: UUID,
         @RequestBody request: UpdateStoreRequest,
     ): UpdateStoreResponse {
-        val userId = authenticationContext.getCurrentUserId()
+        val userId = istioHeaderExtractor.extractUserId(httpRequest)
         val command = request.toCommand(storeId, userId)
         val result = updateService.update(command)
         return UpdateStoreResponse.from(result)
@@ -120,12 +121,12 @@ class StoreController(
             ApiResponse(responseCode = "404", description = "스토어를 찾을 수 없음"),
         ],
     )
-    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{storeId}")
     fun deleteStore(
+        httpRequest: HttpServletRequest,
         @PathVariable storeId: UUID,
     ): DeleteStoreResponse {
-        val userId = authenticationContext.getCurrentUserId()
+        val userId = istioHeaderExtractor.extractUserId(httpRequest)
         val command =
             DeleteStoreCommand(
                 storeId = storeId,
@@ -170,10 +171,9 @@ class StoreController(
             ApiResponse(responseCode = "404", description = "스토어를 찾을 수 없음"),
         ],
     )
-    @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/mine")
-    fun getMyStore(): GetStoreResponse {
-        val userId = authenticationContext.getCurrentUserId()
+    fun getMyStore(httpRequest: HttpServletRequest): GetStoreResponse {
+        val userId = istioHeaderExtractor.extractUserId(httpRequest)
         val result = getStoreService.getMyStore(userId)
         return GetStoreResponse.from(result)
     }
