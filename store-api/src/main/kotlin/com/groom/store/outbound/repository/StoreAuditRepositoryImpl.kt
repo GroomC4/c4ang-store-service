@@ -1,6 +1,6 @@
-package com.groom.ecommerce.store.infrastructure.repository
+package com.groom.store.outbound.repository
 
-import com.groom.ecommerce.store.domain.model.StoreAudit
+import com.groom.store.domain.model.StoreAudit
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.util.UUID

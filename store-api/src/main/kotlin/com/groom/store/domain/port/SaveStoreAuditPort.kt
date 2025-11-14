@@ -1,6 +1,6 @@
 package com.groom.store.domain.port
 
-import com.groom.ecommerce.store.domain.model.StoreAudit
+import com.groom.store.domain.model.StoreAudit
 
 /**
  * 스토어 감사 로그 저장을 위한 Outbound Port.

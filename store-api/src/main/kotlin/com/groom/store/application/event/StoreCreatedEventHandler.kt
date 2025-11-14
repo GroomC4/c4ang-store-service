@@ -1,7 +1,7 @@
 package com.groom.store.application.event
 
-import com.groom.ecommerce.store.domain.event.StoreCreatedEvent
-import com.groom.ecommerce.store.domain.service.StoreAuditRecorder
+import com.groom.store.domain.event.StoreCreatedEvent
+import com.groom.store.domain.service.StoreAuditRecorder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional

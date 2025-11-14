@@ -34,8 +34,9 @@ class StorePolicy(
      * @throws StoreException.StoreAlreadyDeleted 이미 삭제된 스토어인 경우
      */
     fun checkStoreDeletable(storeId: UUID) {
-        val store = loadStorePort.loadById(storeId)
-            ?: throw StoreException.StoreNotFound(storeId)
+        val store =
+            loadStorePort.loadById(storeId)
+                ?: throw StoreException.StoreNotFound(storeId)
 
         if (store.status == StoreStatus.DELETED) {
             throw StoreException.StoreAlreadyDeleted(storeId)
@@ -53,8 +54,9 @@ class StorePolicy(
         storeId: UUID,
         userId: UUID,
     ) {
-        val store = loadStorePort.loadById(storeId)
-            ?: throw StoreException.StoreNotFound(storeId)
+        val store =
+            loadStorePort.loadById(storeId)
+                ?: throw StoreException.StoreNotFound(storeId)
 
         if (store.ownerUserId != userId) {
             throw StoreException.StoreAccessDenied(storeId, userId)

@@ -11,8 +11,12 @@ import java.util.UUID
  */
 interface StoreJpaRepository : JpaRepository<Store, UUID> {
     fun findByOwnerUserId(ownerUserId: UUID): Store?
+
     fun findByStatus(status: StoreStatus): List<Store>
+
     fun findByNameContaining(name: String): List<Store>
+
     fun existsByOwnerUserId(ownerUserId: UUID): Boolean
+
     fun findByIdIn(ids: Collection<UUID>): List<Store>
 }

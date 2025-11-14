@@ -14,33 +14,19 @@ import java.util.UUID
 @Component
 class StorePersistenceAdapter(
     private val storeJpaRepository: StoreJpaRepository,
-) : LoadStorePort, SaveStorePort {
+) : LoadStorePort,
+    SaveStorePort {
+    override fun loadById(storeId: UUID): Store? = storeJpaRepository.findById(storeId).orElse(null)
 
-    override fun loadById(storeId: UUID): Store? {
-        return storeJpaRepository.findById(storeId).orElse(null)
-    }
+    override fun loadByOwnerUserId(ownerUserId: UUID): Store? = storeJpaRepository.findByOwnerUserId(ownerUserId)
 
-    override fun loadByOwnerUserId(ownerUserId: UUID): Store? {
-        return storeJpaRepository.findByOwnerUserId(ownerUserId)
-    }
+    override fun loadByStatus(status: StoreStatus): List<Store> = storeJpaRepository.findByStatus(status)
 
-    override fun loadByStatus(status: StoreStatus): List<Store> {
-        return storeJpaRepository.findByStatus(status)
-    }
+    override fun loadByNameContaining(name: String): List<Store> = storeJpaRepository.findByNameContaining(name)
 
-    override fun loadByNameContaining(name: String): List<Store> {
-        return storeJpaRepository.findByNameContaining(name)
-    }
+    override fun existsByOwnerUserId(ownerUserId: UUID): Boolean = storeJpaRepository.existsByOwnerUserId(ownerUserId)
 
-    override fun existsByOwnerUserId(ownerUserId: UUID): Boolean {
-        return storeJpaRepository.existsByOwnerUserId(ownerUserId)
-    }
+    override fun loadAllById(storeIds: Iterable<UUID>): List<Store> = storeJpaRepository.findAllById(storeIds)
 
-    override fun loadAllById(storeIds: Iterable<UUID>): List<Store> {
-        return storeJpaRepository.findAllById(storeIds)
-    }
-
-    override fun save(store: Store): Store {
-        return storeJpaRepository.save(store)
-    }
+    override fun save(store: Store): Store = storeJpaRepository.save(store)
 }
