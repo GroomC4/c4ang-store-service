@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface StoreAuditRepositoryImpl : JpaRepository<StoreAudit, UUID> {
+interface StoreAuditRepository : JpaRepository<StoreAudit, UUID> {
     /**
      * 특정 스토어의 감사 로그를 시간 역순으로 조회
      */

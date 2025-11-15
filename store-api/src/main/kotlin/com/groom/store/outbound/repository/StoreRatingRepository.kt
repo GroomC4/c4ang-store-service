@@ -7,6 +7,6 @@ import java.util.Optional
 import java.util.UUID
 
 @Repository
-interface StoreRatingRepositoryImpl : JpaRepository<StoreRating, UUID> {
+interface StoreRatingRepository : JpaRepository<StoreRating, UUID> {
     fun findByStore_Id(storeId: UUID): Optional<StoreRating>
 }

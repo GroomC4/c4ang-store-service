@@ -30,15 +30,15 @@ class StoreInfoUpdatedEventHandler(
      * 메인 트랜잭션 커밋 후에 실행되며, 별도의 새로운 트랜잭션에서 동작한다.
      *
      * @param event 스토어 정보 수정 이벤트
+     *
+     * NOTE: 감사 로그 기록은 이제 Application Service에서 직접 처리합니다.
+     * 이벤트 핸들러는 나중에 다른 용도(예: Product 도메인 동기화)를 위해 유지합니다.
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleStoreInfoUpdated(event: StoreInfoUpdatedEvent) {
-        // 1. 감사 로그 기록
-        storeAuditRecorder.recordStoreInfoUpdated(event)
-
         // TODO: Product 도메인 의존성 구현 후 활성화
-        // 2. 스토어 이름이 변경된 경우 p_product의 비정규화 컬럼(store_name) 일괄 업데이트
+        // 스토어 이름이 변경된 경우 p_product의 비정규화 컬럼(store_name) 일괄 업데이트
         // if (event.isNameChanged()) {
         //     productRepository.bulkUpdateStoreName(
         //         storeId = event.storeId,

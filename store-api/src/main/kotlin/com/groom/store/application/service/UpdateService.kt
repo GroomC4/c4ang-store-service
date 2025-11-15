@@ -6,6 +6,7 @@ import com.groom.store.common.exception.StoreException
 import com.groom.store.domain.port.LoadStorePort
 import com.groom.store.domain.port.PublishEventPort
 import com.groom.store.domain.port.SaveStorePort
+import com.groom.store.domain.service.StoreAuditRecorder
 import com.groom.store.domain.service.StorePolicy
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +21,7 @@ class UpdateService(
     private val saveStorePort: SaveStorePort,
     private val publishEventPort: PublishEventPort,
     private val storePolicy: StorePolicy,
+    private val storeAuditRecorder: StoreAuditRecorder,
 ) {
     /**
      * 스토어 정보를 수정한다.
@@ -49,9 +51,11 @@ class UpdateService(
         // 새 Store 인스턴스 저장 (불변 객체 패턴)
         val savedStore = saveStorePort.save(updateResult.updatedStore)
 
-        // 도메인 이벤트 발행 (변경사항이 있는 경우에만)
-        updateResult.event
-            ?.let { publishEventPort.publishStoreInfoUpdated(it) }
+        // 도메인 이벤트 발행 및 감사 로그 기록 (변경사항이 있는 경우에만)
+        updateResult.event?.let { event ->
+            storeAuditRecorder.recordStoreInfoUpdated(event)
+            publishEventPort.publishStoreInfoUpdated(event)
+        }
 
         return UpdateStoreResult(
             storeId = savedStore.id.toString(),

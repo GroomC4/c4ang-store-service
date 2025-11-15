@@ -1,12 +1,12 @@
 package com.groom.store.application.service
 
+import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.application.dto.DeleteStoreCommand
 import com.groom.store.common.TransactionApplier
 import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.common.config.MockUserServiceConfig
 import com.groom.store.common.enums.StoreStatus
 import com.groom.store.common.exception.StoreException
-import com.groom.store.outbound.repository.StoreRepositoryImpl
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -30,7 +30,7 @@ class DeleteStoreServiceIntegrationTest {
     private lateinit var deleteStoreService: DeleteStoreService
 
     @Autowired
-    private lateinit var storeRepository: StoreRepositoryImpl
+    private lateinit var storeRepository: StoreRepository
 
     @Autowired
     private lateinit var transactionApplier: TransactionApplier

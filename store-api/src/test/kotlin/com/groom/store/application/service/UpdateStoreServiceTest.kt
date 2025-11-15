@@ -8,6 +8,7 @@ import com.groom.store.domain.model.Store
 import com.groom.store.domain.port.LoadStorePort
 import com.groom.store.domain.port.PublishEventPort
 import com.groom.store.domain.port.SaveStorePort
+import com.groom.store.domain.service.StoreAuditRecorder
 import com.groom.store.domain.service.StorePolicy
 import com.groom.store.fixture.StoreTestFixture
 import io.kotest.assertions.throwables.shouldThrow
@@ -41,6 +42,7 @@ class UpdateStoreServiceTest :
                     saveStorePort = saveStorePort,
                     publishEventPort = publishEventPort,
                     storePolicy = storePolicy,
+                    storeAuditRecorder = mockk<StoreAuditRecorder>(relaxed = true),
                 )
 
             val storeId = UUID.randomUUID()
@@ -99,6 +101,7 @@ class UpdateStoreServiceTest :
                     saveStorePort = saveStorePort,
                     publishEventPort = publishEventPort,
                     storePolicy = storePolicy,
+                    storeAuditRecorder = mockk<StoreAuditRecorder>(relaxed = true),
                 )
 
             val storeId = UUID.randomUUID()
@@ -140,6 +143,7 @@ class UpdateStoreServiceTest :
                     saveStorePort = saveStorePort,
                     publishEventPort = publishEventPort,
                     storePolicy = storePolicy,
+                    storeAuditRecorder = mockk<StoreAuditRecorder>(relaxed = true),
                 )
 
             val storeId = UUID.randomUUID()
@@ -183,6 +187,7 @@ class UpdateStoreServiceTest :
                     saveStorePort = saveStorePort,
                     publishEventPort = publishEventPort,
                     storePolicy = storePolicy,
+                    storeAuditRecorder = mockk<StoreAuditRecorder>(relaxed = true),
                 )
 
             val storeId = UUID.randomUUID()

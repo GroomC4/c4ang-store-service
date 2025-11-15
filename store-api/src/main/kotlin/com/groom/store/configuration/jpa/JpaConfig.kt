@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.context.annotation.Profile
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
@@ -15,11 +14,9 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
 
-@Profile("!test")
 @Configuration
 @EnableJpaRepositories(
     basePackages = ["com.groom.store"],
-    repositoryImplementationPostfix = "RepositoryImpl",
     entityManagerFactoryRef = "entityManagerFactory",
     transactionManagerRef = "transactionManager",
 )
@@ -36,7 +33,7 @@ class JpaConfig {
     ): LocalContainerEntityManagerFactoryBean =
         LocalContainerEntityManagerFactoryBean().apply {
             this.dataSource = dataSource
-            this.setPackagesToScan("com.groom.customer")
+            this.setPackagesToScan("com.groom.store")
             this.jpaVendorAdapter =
                 HibernateJpaVendorAdapter().apply {
                     setDatabase(Database.POSTGRESQL)

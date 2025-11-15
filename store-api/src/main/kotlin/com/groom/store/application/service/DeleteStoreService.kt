@@ -6,6 +6,7 @@ import com.groom.store.common.exception.StoreException
 import com.groom.store.domain.port.LoadStorePort
 import com.groom.store.domain.port.PublishEventPort
 import com.groom.store.domain.port.SaveStorePort
+import com.groom.store.domain.service.StoreAuditRecorder
 import com.groom.store.domain.service.StoreManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +21,7 @@ class DeleteStoreService(
     private val saveStorePort: SaveStorePort,
     private val publishEventPort: PublishEventPort,
     private val storeManager: StoreManager,
+    private val storeAuditRecorder: StoreAuditRecorder,
 ) {
     /**
      * 스토어를 삭제한다 (소프트 삭제).
@@ -43,7 +45,8 @@ class DeleteStoreService(
         // 새 Store 인스턴스 저장 (불변 객체 패턴)
         val savedStore = saveStorePort.save(deleteResult.deletedStore)
 
-        // 도메인 이벤트 발행
+        // 도메인 이벤트 발행 및 감사 로그 기록
+        storeAuditRecorder.recordStoreDeleted(deleteResult.event)
         publishEventPort.publishStoreDeleted(deleteResult.event)
 
         return DeleteStoreResult(

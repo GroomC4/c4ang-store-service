@@ -2,11 +2,11 @@ package com.groom.store.inbound.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.groom.store.adapter.inbound.web.dto.RegisterStoreRequest
+import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.common.TransactionApplier
 import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.common.config.MockUserServiceConfig
 import com.groom.store.common.util.IstioHeaderExtractor
-import com.groom.store.outbound.repository.StoreRepositoryImpl
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -38,7 +38,7 @@ class StoreControllerIntegrationTest {
     private lateinit var objectMapper: ObjectMapper
 
     @Autowired
-    private lateinit var storeRepository: StoreRepositoryImpl
+    private lateinit var storeRepository: StoreRepository
 
     @Autowired
     private lateinit var transactionApplier: TransactionApplier

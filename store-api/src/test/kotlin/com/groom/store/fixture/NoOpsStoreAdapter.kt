@@ -4,10 +4,8 @@ import com.groom.store.common.enums.StoreStatus
 import com.groom.store.domain.model.Store
 import com.groom.store.domain.model.StoreRating
 import com.groom.store.domain.service.StoreFactory
+import com.groom.store.domain.service.StorePolicy
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.springframework.context.annotation.Primary
-import org.springframework.context.annotation.Profile
-import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -15,13 +13,11 @@ import java.util.UUID
 private val logger = KotlinLogging.logger {}
 
 /**
- * 테스트 환경 전용 StoreFactory 구현체
+ * 단위 테스트용 StoreFactory 구현체
+ * 빈으로 등록하지 않고, 필요한 테스트에서 생성자로 직접 주입하여 사용
  */
-@Component
-@Profile("test")
-@Primary
 class NoOpsStoreAdapter(
-    storePolicy: NoOpsStorePolicy,
+    storePolicy: StorePolicy,
 ) : StoreFactory(storePolicy) {
     override fun createNewStore(
         ownerUserId: UUID,

@@ -13,12 +13,12 @@ import java.util.UUID
  */
 @Component
 class StorePersistenceAdapter(
-    private val storeJpaRepository: StoreJpaRepository,
+    private val storeJpaRepository: StoreRepository,
 ) : LoadStorePort,
     SaveStorePort {
     override fun loadById(storeId: UUID): Store? = storeJpaRepository.findById(storeId).orElse(null)
 
-    override fun loadByOwnerUserId(ownerUserId: UUID): Store? = storeJpaRepository.findByOwnerUserId(ownerUserId)
+    override fun loadByOwnerUserId(ownerUserId: UUID): Store? = storeJpaRepository.findByOwnerUserId(ownerUserId).orElse(null)
 
     override fun loadByStatus(status: StoreStatus): List<Store> = storeJpaRepository.findByStatus(status)
 

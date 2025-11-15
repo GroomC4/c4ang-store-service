@@ -47,11 +47,10 @@ class StoreAudit(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is StoreAudit) return false
-        if (id == null || other.id == null) return false
         return id == other.id
     }
 
-    override fun hashCode(): Int = id?.hashCode() ?: System.identityHashCode(this)
+    override fun hashCode(): Int = id.hashCode()
 
     override fun toString(): String = "StoreAudit(id=$id, storeId=$storeId, eventType=$eventType, recordedAt=$recordedAt)"
 }

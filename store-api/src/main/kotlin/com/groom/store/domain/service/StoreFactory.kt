@@ -26,7 +26,7 @@ class StoreFactory(
      * @param name 스토어명
      * @param description 스토어 설명 (선택)
      * @return 생성된 Store 엔티티 (StoreRating이 포함됨)
-     * @throws com.groom.ecommerce.common.exception.StoreException.DuplicateStore 이미 스토어를 보유한 경우
+     * @throws com.groom.store.common.exception.StoreException.DuplicateStore 이미 스토어를 보유한 경우
      */
     fun createNewStore(
         ownerUserId: UUID,
