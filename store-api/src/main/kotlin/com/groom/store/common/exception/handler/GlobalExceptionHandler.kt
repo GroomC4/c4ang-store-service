@@ -5,6 +5,7 @@ import com.groom.store.common.exception.ErrorCode
 import com.groom.store.common.exception.PermissionException
 import com.groom.store.common.exception.RefreshTokenException
 import com.groom.store.common.exception.ResourceException
+import com.groom.store.common.exception.StoreException
 import com.groom.store.common.exception.UserException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
@@ -193,6 +194,57 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             ErrorResponse(
                 code = errorCode,
                 message = e.message ?: "리소스 처리 중 오류가 발생하였습니다.",
+            ),
+            httpStatus,
+        )
+    }
+
+    @ExceptionHandler(StoreException::class)
+    fun handleStoreException(e: StoreException): ResponseEntity<ErrorResponse> {
+        val (errorCode, httpStatus) =
+            when (e) {
+                is StoreException.StoreNotFound -> {
+                    logger.warn(e) { "Store not found: storeId=${e.storeId}" }
+                    ErrorCode.STORE_NOT_FOUND to HttpStatus.NOT_FOUND
+                }
+                is StoreException.DuplicateStore -> {
+                    logger.warn(e) { "Duplicate store: ownerUserId=${e.ownerUserId}" }
+                    ErrorCode.DUPLICATE_STORE to HttpStatus.CONFLICT
+                }
+                is StoreException.StoreRegistrationRequired -> {
+                    logger.warn(e) { "Store registration required: userId=${e.userId}, storeId=${e.storeId}" }
+                    ErrorCode.STORE_REGISTRATION_REQUIRED to HttpStatus.BAD_REQUEST
+                }
+                is StoreException.StoreAccessDenied -> {
+                    logger.warn(e) { "Store access denied: storeId=${e.storeId}, userId=${e.userId}" }
+                    ErrorCode.STORE_ACCESS_DENIED to HttpStatus.FORBIDDEN
+                }
+                is StoreException.StoreAlreadySuspended -> {
+                    logger.warn(e) { "Store already suspended: storeId=${e.storeId}" }
+                    ErrorCode.STORE_ALREADY_SUSPENDED to HttpStatus.CONFLICT
+                }
+                is StoreException.StoreAlreadyDeleted -> {
+                    logger.warn(e) { "Store already deleted: storeId=${e.storeId}" }
+                    ErrorCode.STORE_ALREADY_DELETED to HttpStatus.CONFLICT
+                }
+                is StoreException.CannotUpdateSuspendedStore -> {
+                    logger.warn(e) { "Cannot update suspended store: storeId=${e.storeId}" }
+                    ErrorCode.CANNOT_UPDATE_SUSPENDED_STORE to HttpStatus.CONFLICT
+                }
+                is StoreException.CannotUpdateDeletedStore -> {
+                    logger.warn(e) { "Cannot update deleted store: storeId=${e.storeId}" }
+                    ErrorCode.CANNOT_UPDATE_DELETED_STORE to HttpStatus.CONFLICT
+                }
+                is StoreException.InvalidStoreStatusTransition -> {
+                    logger.warn(e) { "Invalid store status transition: storeId=${e.storeId}, from=${e.currentStatus}, to=${e.targetStatus}" }
+                    ErrorCode.INVALID_STORE_STATUS_TRANSITION to HttpStatus.CONFLICT
+                }
+            }
+
+        return ResponseEntity(
+            ErrorResponse(
+                code = errorCode,
+                message = e.message ?: "스토어 처리 중 오류가 발생하였습니다.",
             ),
             httpStatus,
         )

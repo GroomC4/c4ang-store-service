@@ -31,9 +31,16 @@ feign:
       connect-timeout: 5000
       read-timeout: 5000
       logger-level: full
+    user-service:
+      url: http://localhost:8080
+      connect-timeout: 5000
+      read-timeout: 5000
+      logger-level: full
   client:
     config:
       store-service:
+        loggerLevel: full
+      user-service:
         loggerLevel: full
 
 spring:

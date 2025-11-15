@@ -9,12 +9,11 @@ import java.util.UUID
 /**
  * user 서비스와 통신하기 위한 Feign Client
  *
- * 테스트 환경에서는 MockStoreClient를 사용하므로 이 빈은 생성되지 않습니다.
+ * 테스트 환경에서는 Spring Cloud Contract Stub Runner를 통해 WireMock stub과 통신합니다.
  */
-@Profile("!test")
 @FeignClient(
-    name = "store-service",
-    url = "\${feign.clients.store-service.url:http://localhost:8081}",
+    name = "user-service",
+    url = "\${feign.clients.user-service.url:http://localhost:8081}",
 )
 interface UserServiceFeignClient : UserServiceClient {
     /**
@@ -23,7 +22,7 @@ interface UserServiceFeignClient : UserServiceClient {
      * @param sellerId 판매자 ID
      * @return 유저 정보
      */
-    @GetMapping("/api/internal/user/{sellerId}")
+    @GetMapping("/api/internal/users/{sellerId}")
     override fun get(
         @PathVariable sellerId: UUID,
     ): UserResponse

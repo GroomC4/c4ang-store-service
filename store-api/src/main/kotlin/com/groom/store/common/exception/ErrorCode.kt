@@ -41,6 +41,7 @@ object ErrorCode {
     // ========== 스토어 관련 에러 ==========
     const val DUPLICATE_STORE = "DUPLICATE_STORE" // 스토어 중복
     const val STORE_NOT_FOUND = "STORE_NOT_FOUND" // 스토어 없음
+    const val STORE_REGISTRATION_REQUIRED = "STORE_REGISTRATION_REQUIRED" // 스토어 등록 필요
     const val STORE_ALREADY_DELETED = "STORE_ALREADY_DELETED" // 스토어 이미 삭제됨
     const val STORE_ALREADY_SUSPENDED = "STORE_ALREADY_SUSPENDED" // 스토어 이미 정지됨
     const val INVALID_STORE_STATUS_TRANSITION = "INVALID_STORE_STATUS_TRANSITION" // 스토어 상태 변경 불가
