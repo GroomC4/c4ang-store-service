@@ -1,8 +1,8 @@
 package com.groom.store.common.base
 
 import com.groom.platform.testSupport.BaseServiceIntegrationTest
+import com.groom.store.adapter.out.client.UserServiceClient
 import com.groom.store.common.extension.SharedContainerExtension
-import com.groom.store.outbound.client.UserServiceClient
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.clearAllMocks
 import org.junit.jupiter.api.BeforeEach

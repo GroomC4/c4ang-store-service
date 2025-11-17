@@ -6,11 +6,11 @@ import com.groom.store.common.TransactionApplier
 import com.groom.store.common.base.StoreBaseServiceIntegrationTest
 import com.groom.store.common.enums.StoreAuditEventType
 import com.groom.store.common.enums.StoreStatus
+import com.groom.store.adapter.out.client.UserResponse
+import com.groom.store.adapter.out.client.UserRole
+import com.groom.store.adapter.out.persistence.StoreAuditRepository
 import com.groom.store.common.exception.StoreException
 import com.groom.store.common.exception.UserException
-import com.groom.store.outbound.client.UserResponse
-import com.groom.store.outbound.client.UserRole
-import com.groom.store.outbound.repository.StoreAuditRepository
 import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

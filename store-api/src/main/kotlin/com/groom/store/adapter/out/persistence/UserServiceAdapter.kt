@@ -1,8 +1,8 @@
 package com.groom.store.adapter.out.persistence
 
+import com.groom.store.adapter.out.client.UserServiceClient
 import com.groom.store.domain.model.UserInfo
 import com.groom.store.domain.port.LoadUserPort
-import com.groom.store.outbound.client.UserServiceClient
 import org.springframework.stereotype.Component
 import java.util.UUID
 

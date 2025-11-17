@@ -1,14 +1,15 @@
-package com.groom.store.inbound.web
+package com.groom.store.adapter.inbound.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.groom.store.adapter.inbound.web.dto.RegisterStoreRequest
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.common.TransactionApplier
+import com.groom.store.adapter.out.client.UserResponse
+import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
 import com.groom.store.common.util.IstioHeaderExtractor
-import com.groom.store.outbound.client.UserResponse
-import com.groom.store.outbound.client.UserRole
 import io.mockk.every
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -39,6 +42,7 @@ class StoreControllerIntegrationTest : StoreBaseControllerIntegrationTest() {
         private val OWNER_USER_ID_1 = UUID.fromString("aaaaaaaa-1111-2222-3333-444444444441")
         private val CUSTOMER_USER_ID_1 = UUID.fromString("bbbbbbbb-1111-2222-3333-444444444442")
         private val UPDATE_OWNER_USER_ID_1 = UUID.fromString("11111111-2222-3333-4444-555555555551")
+        private val UPDATE_OWNER_USER_ID_2 = UUID.fromString("22222222-2222-3333-4444-555555555552")
         private val UPDATE_OWNER_USER_ID_3 = UUID.fromString("33333333-2222-3333-4444-555555555553")
     }
 
@@ -266,6 +270,224 @@ class StoreControllerIntegrationTest : StoreBaseControllerIntegrationTest() {
                         .content(updateRequest),
                 ).andExpect(status().isNotFound)
                 .andExpect(jsonPath("$.code").value("STORE_NOT_FOUND"))
+        }
+    }
+
+    @Nested
+    @DisplayName("스토어 조회 API 테스트")
+    @SqlGroup(
+        Sql(scripts = ["/sql/cleanup-store-controller-get.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        Sql(scripts = ["/sql/init-store-controller-get.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        Sql(scripts = ["/sql/cleanup-store-controller-get.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD),
+    )
+    inner class GetStoreTests {
+        @Test
+        @DisplayName("GET /api/v1/stores/{storeId} - 존재하는 스토어를 성공적으로 조회한다")
+        fun testSuccessfulStoreRetrieval() {
+            // given: SQL에서 생성한 Store 사용
+            val storeId = "11111111-2222-3333-4444-555555555571"
+
+            // when & then: 인증 없이도 스토어 조회 가능
+            mockMvc
+                .perform(get("/api/v1/stores/$storeId"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.storeId").value(storeId))
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.status").exists())
+                .andExpect(jsonPath("$.createdAt").exists())
+        }
+
+        @Test
+        @DisplayName("GET /api/v1/stores/{storeId} - 존재하지 않는 스토어 조회 시 404 Not Found를 반환한다")
+        fun testGetNonExistentStore() {
+            // given
+            val nonExistentStoreId =
+                UUID
+                    .randomUUID()
+                    .toString()
+
+            // when & then
+            mockMvc
+                .perform(get("/api/v1/stores/$nonExistentStoreId"))
+                .andExpect(status().isNotFound)
+                .andExpect(jsonPath("$.code").value("STORE_NOT_FOUND"))
+        }
+
+        @Test
+        @DisplayName("GET /api/v1/stores/mine - 인증된 Owner가 자신의 스토어를 조회한다")
+        fun testGetMyStore() {
+            // given: SQL에서 생성한 Owner User와 Store 사용
+            every { userServiceClient.get(UPDATE_OWNER_USER_ID_1) } returns
+                UserResponse(
+                    id = UPDATE_OWNER_USER_ID_1,
+                    name = "Update Owner User 1",
+                    role = UserRole.OWNER,
+                )
+
+            // when & then
+            mockMvc
+                .perform(
+                    get("/api/v1/stores/mine")
+                        .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString()),
+                ).andExpect(status().isOk)
+                .andExpect(jsonPath("$.storeId").exists())
+                .andExpect(jsonPath("$.name").exists())
+        }
+
+        @Test
+        @DisplayName("GET /api/v1/stores/mine - 스토어가 없는 Owner가 조회 시 404 Not Found를 반환한다")
+        fun testGetMyStore_NoStore() {
+            // given: 스토어가 없는 Owner
+            val ownerWithoutStore = UUID.randomUUID()
+            every { userServiceClient.get(ownerWithoutStore) } returns
+                UserResponse(
+                    id = ownerWithoutStore,
+                    name = "Owner Without Store",
+                    role = UserRole.OWNER,
+                )
+
+            // when & then
+            mockMvc
+                .perform(
+                    get("/api/v1/stores/mine")
+                        .header(IstioHeaderExtractor.USER_ID_HEADER, ownerWithoutStore.toString()),
+                ).andExpect(status().isNotFound)
+                .andExpect(jsonPath("$.code").value("STORE_NOT_FOUND"))
+        }
+
+        @Test
+        @DisplayName("GET /api/v1/stores/mine - 인증되지 않은 요청은 500 Internal Server Error를 반환한다")
+        fun testGetMyStore_Unauthorized() {
+            // when & then: X-User-Id 헤더가 없으면 IstioHeaderExtractor에서 예외 발생
+            mockMvc
+                .perform(get("/api/v1/stores/mine"))
+                .andExpect(status().isInternalServerError)
+        }
+    }
+
+    @Nested
+    @DisplayName("스토어 삭제 API 테스트")
+    @SqlGroup(
+        Sql(scripts = ["/sql/cleanup-store-controller-delete.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        Sql(scripts = ["/sql/init-store-controller-delete.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        Sql(scripts = ["/sql/cleanup-store-controller-delete.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD),
+    )
+    inner class DeleteStoreTests {
+        @Test
+        @DisplayName("DELETE /api/v1/stores/{storeId} - 인증된 Owner가 자신의 스토어를 성공적으로 삭제한다")
+        fun testSuccessfulStoreDeletion() {
+            // given: SQL에서 생성한 Owner User와 Store 사용
+            every { userServiceClient.get(UPDATE_OWNER_USER_ID_1) } returns
+                UserResponse(
+                    id = UPDATE_OWNER_USER_ID_1,
+                    name = "Update Owner User 1",
+                    role = UserRole.OWNER,
+                )
+
+            val storeId = "11111111-2222-3333-4444-555555555571"
+
+            // when & then
+            mockMvc
+                .perform(
+                    delete("/api/v1/stores/$storeId")
+                        .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString()),
+                ).andExpect(status().isOk)
+                .andExpect(jsonPath("$.storeId").value(storeId))
+                .andExpect(jsonPath("$.status").value("DELETED"))
+                .andExpect(jsonPath("$.deletedAt").exists())
+
+            // 삭제 확인: DB에서 실제로 DELETED 상태로 변경되었는지 확인
+            val deletedStore =
+                transactionApplier.applyPrimaryTransaction {
+                    storeRepository.findById(UUID.fromString(storeId)).orElse(null)
+                }
+            assertThat(deletedStore).isNotNull()
+            assertThat(deletedStore?.status).isEqualTo(com.groom.store.common.enums.StoreStatus.DELETED)
+        }
+
+        @Test
+        @DisplayName("DELETE /api/v1/stores/{storeId} - 다른 Owner의 스토어 삭제 시도 시 403 Forbidden을 반환한다")
+        fun testDeleteOtherOwnerStore() {
+            // given: SQL에서 생성한 User 3으로, User 1의 Store 삭제 시도
+            every { userServiceClient.get(UPDATE_OWNER_USER_ID_3) } returns
+                UserResponse(
+                    id = UPDATE_OWNER_USER_ID_3,
+                    name = "Update Owner User 3",
+                    role = UserRole.OWNER,
+                )
+
+            val user1StoreId = "11111111-2222-3333-4444-555555555571"
+
+            // when & then
+            mockMvc
+                .perform(
+                    delete("/api/v1/stores/$user1StoreId")
+                        .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_3.toString()),
+                ).andDo(print())
+                .andExpect(status().isForbidden)
+                .andExpect(jsonPath("$.code").value("STORE_ACCESS_DENIED"))
+        }
+
+        @Test
+        @DisplayName("DELETE /api/v1/stores/{storeId} - 존재하지 않는 스토어 삭제 시도 시 404 Not Found를 반환한다")
+        fun testDeleteNonExistentStore() {
+            // given
+            every { userServiceClient.get(UPDATE_OWNER_USER_ID_1) } returns
+                UserResponse(
+                    id = UPDATE_OWNER_USER_ID_1,
+                    name = "Update Owner User 1",
+                    role = UserRole.OWNER,
+                )
+
+            val nonExistentStoreId =
+                UUID
+                    .randomUUID()
+                    .toString()
+
+            // when & then
+            mockMvc
+                .perform(
+                    delete("/api/v1/stores/$nonExistentStoreId")
+                        .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString()),
+                ).andExpect(status().isNotFound)
+                .andExpect(jsonPath("$.code").value("STORE_NOT_FOUND"))
+        }
+
+        @Test
+        @DisplayName("DELETE /api/v1/stores/{storeId} - 인증되지 않은 요청은 500 Internal Server Error를 반환한다")
+        fun testDeleteStore_Unauthorized() {
+            // given
+            val fakeStoreId =
+                UUID
+                    .randomUUID()
+                    .toString()
+
+            // when & then: X-User-Id 헤더가 없으면 IstioHeaderExtractor에서 예외 발생
+            mockMvc
+                .perform(delete("/api/v1/stores/$fakeStoreId"))
+                .andExpect(status().isInternalServerError)
+        }
+
+        @Test
+        @DisplayName("DELETE /api/v1/stores/{storeId} - 이미 삭제된 스토어 재삭제 시도 시 409 Conflict를 반환한다")
+        fun testDeleteAlreadyDeletedStore() {
+            // given: 이미 삭제된 스토어 (SQL에서 DELETED 상태로 생성)
+            every { userServiceClient.get(UPDATE_OWNER_USER_ID_2) } returns
+                UserResponse(
+                    id = UPDATE_OWNER_USER_ID_2,
+                    name = "Update Owner User 2",
+                    role = UserRole.OWNER,
+                )
+
+            val deletedStoreId = "22222222-2222-3333-4444-555555555572"
+
+            // when & then
+            mockMvc
+                .perform(
+                    delete("/api/v1/stores/$deletedStoreId")
+                        .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_2.toString()),
+                ).andExpect(status().isConflict)
+                .andExpect(jsonPath("$.code").value("STORE_ALREADY_DELETED"))
         }
     }
 }

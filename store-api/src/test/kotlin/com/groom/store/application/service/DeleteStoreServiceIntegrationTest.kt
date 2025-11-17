@@ -4,10 +4,10 @@ import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.application.dto.DeleteStoreCommand
 import com.groom.store.common.TransactionApplier
 import com.groom.store.common.base.StoreBaseServiceIntegrationTest
+import com.groom.store.adapter.out.client.UserResponse
+import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.common.enums.StoreStatus
 import com.groom.store.common.exception.StoreException
-import com.groom.store.outbound.client.UserResponse
-import com.groom.store.outbound.client.UserRole
 import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

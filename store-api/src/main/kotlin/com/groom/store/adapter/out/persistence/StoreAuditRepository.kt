@@ -1,4 +1,4 @@
-package com.groom.store.outbound.repository
+package com.groom.store.adapter.out.persistence
 
 import com.groom.store.domain.model.StoreAudit
 import org.springframework.data.jpa.repository.JpaRepository

@@ -1,6 +1,6 @@
 package com.groom.store.fixture
 
-import com.groom.store.outbound.client.UserRole
+import com.groom.store.adapter.out.client.UserRole
 import java.util.UUID
 
 /**

@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.jpa")
+    jacoco
 }
 
 sourceSets {
@@ -138,4 +139,67 @@ val dockerComposeDown by tasks.registering(Exec::class) {
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     dependsOn(dockerComposeUp)
     finalizedBy(dockerComposeDown)
+}
+
+// JaCoCo 설정
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test, integrationTest)
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/configuration/**",
+                    "**/config/**",
+                    "**/*Application*",
+                    "**/dto/**",
+                    "**/enums/**",
+                    "**/port/**"
+                )
+            }
+        })
+    )
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.70".toBigDecimal()
+            }
+        }
+
+        rule {
+            element = "CLASS"
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = "0.70".toBigDecimal()
+            }
+            excludes = listOf(
+                "*.configuration.*",
+                "*.config.*",
+                "*Application",
+                "*.dto.*",
+                "*.enums.*",
+                "*.port.*"
+            )
+        }
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
 }
