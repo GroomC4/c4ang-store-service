@@ -1,18 +1,16 @@
 package com.groom.store.common.base
 
-import com.groom.platform.testSupport.BaseControllerIntegrationTest
 import com.groom.store.adapter.out.client.UserServiceClient
-import com.groom.store.common.extension.SharedContainerExtension
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.clearAllMocks
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.web.servlet.MockMvc
 
 /**
  * Store Service의 Controller 계층 통합테스트 Base Class
  *
- * Platform-core의 BaseControllerIntegrationTest를 상속받아
- * Store Service에 필요한 UserServiceClient Mock과 SharedContainerExtension을 추가합니다.
+ * Store Service에 필요한 UserServiceClient Mock과 MockMvc를 제공합니다.
  *
  * 사용 방법:
  * ```kotlin
@@ -32,8 +30,9 @@ import org.junit.jupiter.api.extension.ExtendWith
  * }
  * ```
  */
-@ExtendWith(SharedContainerExtension::class)
-abstract class StoreBaseControllerIntegrationTest : BaseControllerIntegrationTest() {
+abstract class StoreBaseControllerIntegrationTest {
+    @Autowired
+    protected lateinit var mockMvc: MockMvc
 
     /**
      * UserServiceClient Mock

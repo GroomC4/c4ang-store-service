@@ -2,10 +2,11 @@ package com.groom.store.adapter.inbound.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.groom.store.adapter.inbound.web.dto.RegisterStoreRequest
-import com.groom.store.adapter.out.persistence.StoreRepository
-import com.groom.store.common.TransactionApplier
 import com.groom.store.adapter.out.client.UserResponse
 import com.groom.store.adapter.out.client.UserRole
+import com.groom.store.adapter.out.persistence.StoreRepository
+import com.groom.store.common.TransactionApplier
+import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
 import com.groom.store.common.util.IstioHeaderExtractor
 import io.mockk.every
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.http.MediaType
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
@@ -26,6 +28,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.UUID
 
+@IntegrationTest
+@AutoConfigureMockMvc
 @DisplayName("스토어 컨트롤러 통합 테스트")
 class StoreControllerIntegrationTest : StoreBaseControllerIntegrationTest() {
     @Autowired

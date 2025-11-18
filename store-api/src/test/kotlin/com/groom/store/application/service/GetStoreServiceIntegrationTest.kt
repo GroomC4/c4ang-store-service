@@ -1,10 +1,11 @@
 package com.groom.store.application.service
 
-import com.groom.store.application.dto.GetStoreQuery
-import com.groom.store.common.TransactionApplier
-import com.groom.store.common.base.StoreBaseServiceIntegrationTest
 import com.groom.store.adapter.out.client.UserResponse
 import com.groom.store.adapter.out.client.UserRole
+import com.groom.store.application.dto.GetStoreQuery
+import com.groom.store.common.TransactionApplier
+import com.groom.store.common.annotation.IntegrationTest
+import com.groom.store.common.base.StoreBaseServiceIntegrationTest
 import com.groom.store.common.enums.StoreStatus
 import com.groom.store.common.exception.StoreException
 import io.mockk.every
@@ -16,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import java.util.UUID
 
+@IntegrationTest
 @SqlGroup(
     Sql(scripts = ["/sql/cleanup-get-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
     Sql(scripts = ["/sql/init-get-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),

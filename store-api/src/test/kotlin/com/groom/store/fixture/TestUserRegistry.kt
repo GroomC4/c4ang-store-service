@@ -10,60 +10,68 @@ import java.util.UUID
  */
 object TestUserRegistry {
     // OWNER 사용자들
-    val OWNER_USER_1 = TestUser(
-        id = UUID.fromString("aaaaaaaa-1111-2222-3333-444444444441"),
-        name = "Owner User 1",
-        role = UserRole.OWNER,
-    )
+    val OWNER_USER_1 =
+        TestUser(
+            id = UUID.fromString("aaaaaaaa-1111-2222-3333-444444444441"),
+            name = "Owner User 1",
+            role = UserRole.OWNER,
+        )
 
-    val OWNER_USER_2 = TestUser(
-        id = UUID.fromString("aaaaaaaa-1111-2222-3333-444444444442"),
-        name = "Owner User 2",
-        role = UserRole.OWNER,
-    )
+    val OWNER_USER_2 =
+        TestUser(
+            id = UUID.fromString("aaaaaaaa-1111-2222-3333-444444444442"),
+            name = "Owner User 2",
+            role = UserRole.OWNER,
+        )
 
     // CUSTOMER 사용자들
-    val CUSTOMER_USER_1 = TestUser(
-        id = UUID.fromString("bbbbbbbb-1111-2222-3333-444444444441"),
-        name = "Customer User 1",
-        role = UserRole.CUSTOMER,
-    )
+    val CUSTOMER_USER_1 =
+        TestUser(
+            id = UUID.fromString("bbbbbbbb-1111-2222-3333-444444444441"),
+            name = "Customer User 1",
+            role = UserRole.CUSTOMER,
+        )
 
-    val CUSTOMER_USER_2 = TestUser(
-        id = UUID.fromString("bbbbbbbb-1111-2222-3333-444444444442"),
-        name = "Customer User 2",
-        role = UserRole.CUSTOMER,
-    )
+    val CUSTOMER_USER_2 =
+        TestUser(
+            id = UUID.fromString("bbbbbbbb-1111-2222-3333-444444444442"),
+            name = "Customer User 2",
+            role = UserRole.CUSTOMER,
+        )
 
     // Update 테스트용 사용자들
-    val UPDATE_OWNER_USER_1 = TestUser(
-        id = UUID.fromString("11111111-2222-3333-4444-555555555551"),
-        name = "Update Owner User 1",
-        role = UserRole.OWNER,
-    )
+    val UPDATE_OWNER_USER_1 =
+        TestUser(
+            id = UUID.fromString("11111111-2222-3333-4444-555555555551"),
+            name = "Update Owner User 1",
+            role = UserRole.OWNER,
+        )
 
-    val UPDATE_OWNER_USER_2 = TestUser(
-        id = UUID.fromString("22222222-2222-3333-4444-555555555552"),
-        name = "Update Owner User 2",
-        role = UserRole.OWNER,
-    )
+    val UPDATE_OWNER_USER_2 =
+        TestUser(
+            id = UUID.fromString("22222222-2222-3333-4444-555555555552"),
+            name = "Update Owner User 2",
+            role = UserRole.OWNER,
+        )
 
-    val UPDATE_OWNER_USER_3 = TestUser(
-        id = UUID.fromString("33333333-2222-3333-4444-555555555553"),
-        name = "Update Owner User 3",
-        role = UserRole.OWNER,
-    )
+    val UPDATE_OWNER_USER_3 =
+        TestUser(
+            id = UUID.fromString("33333333-2222-3333-4444-555555555553"),
+            name = "Update Owner User 3",
+            role = UserRole.OWNER,
+        )
 
     // 전체 사용자 맵
-    private val userMap: Map<UUID, TestUser> = listOf(
-        OWNER_USER_1,
-        OWNER_USER_2,
-        CUSTOMER_USER_1,
-        CUSTOMER_USER_2,
-        UPDATE_OWNER_USER_1,
-        UPDATE_OWNER_USER_2,
-        UPDATE_OWNER_USER_3,
-    ).associateBy { it.id }
+    private val userMap: Map<UUID, TestUser> =
+        listOf(
+            OWNER_USER_1,
+            OWNER_USER_2,
+            CUSTOMER_USER_1,
+            CUSTOMER_USER_2,
+            UPDATE_OWNER_USER_1,
+            UPDATE_OWNER_USER_2,
+            UPDATE_OWNER_USER_3,
+        ).associateBy { it.id }
 
     /**
      * 사용자 ID로 테스트 사용자 조회

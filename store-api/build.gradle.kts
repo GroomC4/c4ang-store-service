@@ -7,13 +7,10 @@ plugins {
     jacoco
 }
 
-sourceSets {
-    test {
-        kotlin {
-            srcDir("../c4ang-platform-core/testcontainers/kotlin")
-        }
-    }
-}
+// Platform Core 버전 관리
+val platformCoreVersion = "1.2.2-RC7"
+// Contract Hub 버전 관리
+val contractHubVersion = "1.0.0-SNAPSHOT"
 
 dependencies {
     // Kotlin
@@ -35,7 +32,7 @@ dependencies {
     implementation("io.confluent:kafka-schema-registry-client:7.5.1")
 
     // Contract Hub (Avro 스키마) - Maven Local에서 가져오기
-    implementation("com.c4ang:c4ang-contract-hub:1.0.0-SNAPSHOT")
+    implementation("com.c4ang:c4ang-contract-hub:$contractHubVersion")
 
     // Spring Cloud BOM (Spring Boot 3.3.4와 호환)
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.3"))
@@ -53,22 +50,18 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
 
+    // Platform Core - DataSource Starter (Primary-Replica 자동 라우팅)
+    implementation("com.groom.platform:datasource-starter:$platformCoreVersion")
+
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql")
-    testImplementation("org.testcontainers:kafka")
-    testImplementation("org.testcontainers:testcontainers")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("io.mockk:mockk:1.14.5")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 
-    // K3s Module 추가
-    testImplementation("org.testcontainers:k3s:1.19.7")
-    testImplementation("io.fabric8:kubernetes-client:6.10.0")
-    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.78")
+    // Platform Core - Testcontainers Starter (PostgreSQL, Redis, Kafka, Schema Registry 자동 구성)
+    testImplementation("com.groom.platform:testcontainers-starter:$platformCoreVersion")
 }
 
 // 모든 Test 태스크에 공통 설정 적용
@@ -156,18 +149,20 @@ tasks.jacocoTestReport {
     }
 
     classDirectories.setFrom(
-        files(classDirectories.files.map {
-            fileTree(it) {
-                exclude(
-                    "**/configuration/**",
-                    "**/config/**",
-                    "**/*Application*",
-                    "**/dto/**",
-                    "**/enums/**",
-                    "**/port/**"
-                )
-            }
-        })
+        files(
+            classDirectories.files.map {
+                fileTree(it) {
+                    exclude(
+                        "**/configuration/**",
+                        "**/config/**",
+                        "**/*Application*",
+                        "**/dto/**",
+                        "**/enums/**",
+                        "**/port/**",
+                    )
+                }
+            },
+        ),
     )
 }
 
@@ -188,14 +183,15 @@ tasks.jacocoTestCoverageVerification {
                 value = "COVEREDRATIO"
                 minimum = "0.70".toBigDecimal()
             }
-            excludes = listOf(
-                "*.configuration.*",
-                "*.config.*",
-                "*Application",
-                "*.dto.*",
-                "*.enums.*",
-                "*.port.*"
-            )
+            excludes =
+                listOf(
+                    "*.configuration.*",
+                    "*.config.*",
+                    "*Application",
+                    "*.dto.*",
+                    "*.enums.*",
+                    "*.port.*",
+                )
         }
     }
 }

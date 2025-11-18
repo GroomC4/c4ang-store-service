@@ -1,11 +1,13 @@
 package com.groom.store.adapter.out.persistence
 
+import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.domain.model.Store
 import com.groom.store.domain.model.StoreRating
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -15,8 +17,10 @@ import java.util.UUID
  *
  * 실제 데이터베이스(Testcontainers)를 사용하여 JPA Repository의 CRUD 동작을 검증합니다.
  */
+@IntegrationTest
+@Transactional
 @DisplayName("StoreRatingRepository 테스트")
-class StoreRatingRepositoryTest : BaseRepositoryTest() {
+class StoreRatingRepositoryTest {
     @Autowired
     private lateinit var storeRatingRepository: StoreRatingRepository
 

@@ -1,3 +1,14 @@
+# Testcontainers 설정 (c4ang-platform-core)
+testcontainers:
+  postgres:
+    enabled: true
+    replica-enabled: true
+    schema-location: project:sql/schema.sql
+  redis:
+    enabled: true
+  kafka:
+    enabled: true
+
 logging:
   level:
     root: INFO
@@ -6,6 +17,7 @@ logging:
     org.postgresql: DEBUG
     com.groom.ecommerce: DEBUG
     com.groom.store: DEBUG
+    com.groom.platform: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.hibernate.orm.jdbc.bind: TRACE
@@ -44,12 +56,20 @@ feign:
         loggerLevel: full
 
 spring:
+  autoconfigure:
+    exclude:
+      - com.groom.platform.datasource.autoconfigure.DataSourceAutoConfiguration
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+      properties:
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
     consumer:
       bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+      properties:
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
   jpa:
     hibernate:
       ddl-auto: none

@@ -236,7 +236,9 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
                     ErrorCode.CANNOT_UPDATE_DELETED_STORE to HttpStatus.CONFLICT
                 }
                 is StoreException.InvalidStoreStatusTransition -> {
-                    logger.warn(e) { "Invalid store status transition: storeId=${e.storeId}, from=${e.currentStatus}, to=${e.targetStatus}" }
+                    logger.warn(
+                        e,
+                    ) { "Invalid store status transition: storeId=${e.storeId}, from=${e.currentStatus}, to=${e.targetStatus}" }
                     ErrorCode.INVALID_STORE_STATUS_TRANSITION to HttpStatus.CONFLICT
                 }
             }

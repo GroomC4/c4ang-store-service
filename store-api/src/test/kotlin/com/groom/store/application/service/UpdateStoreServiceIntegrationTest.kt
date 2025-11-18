@@ -1,10 +1,11 @@
 package com.groom.store.application.service
 
+import com.groom.store.adapter.out.client.UserResponse
+import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.application.dto.UpdateStoreCommand
 import com.groom.store.common.TransactionApplier
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
+import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.common.base.StoreBaseServiceIntegrationTest
 import com.groom.store.common.exception.StoreException
 import io.mockk.every
@@ -16,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import java.util.UUID
 
+@IntegrationTest
 @SqlGroup(
     Sql(scripts = ["/sql/cleanup-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
     Sql(scripts = ["/sql/init-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
@@ -52,11 +54,12 @@ class UpdateStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `스토어 소유자가 자신의 스토어를 성공적으로 수정한다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_1) } returns UserResponse(
-            id = OWNER_USER_ID_1,
-            name = "Test Owner",
-            role = UserRole.OWNER
-        )
+        every { userServiceClient.get(OWNER_USER_ID_1) } returns
+            UserResponse(
+                id = OWNER_USER_ID_1,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
 
         val command =
             UpdateStoreCommand(
@@ -91,11 +94,12 @@ class UpdateStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `description을 null로 수정할 수 있다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_2) } returns UserResponse(
-            id = OWNER_USER_ID_2,
-            name = "Test Owner",
-            role = UserRole.OWNER
-        )
+        every { userServiceClient.get(OWNER_USER_ID_2) } returns
+            UserResponse(
+                id = OWNER_USER_ID_2,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
 
         val command =
             UpdateStoreCommand(
@@ -121,11 +125,12 @@ class UpdateStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `스토어 소유자가 아닌 사용자가 스토어를 수정하려고 하면 실패한다`() {
         // given - STORE_ID_3는 OWNER_USER_ID_3 소유이고, OWNER_USER_ID_4가 수정 시도
-        every { userServiceClient.get(OWNER_USER_ID_4) } returns UserResponse(
-            id = OWNER_USER_ID_4,
-            name = "Test Owner",
-            role = UserRole.OWNER
-        )
+        every { userServiceClient.get(OWNER_USER_ID_4) } returns
+            UserResponse(
+                id = OWNER_USER_ID_4,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
 
         val command =
             UpdateStoreCommand(
@@ -155,11 +160,12 @@ class UpdateStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `존재하지 않는 스토어를 수정하려고 하면 실패한다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_5) } returns UserResponse(
-            id = OWNER_USER_ID_5,
-            name = "Test Owner",
-            role = UserRole.OWNER
-        )
+        every { userServiceClient.get(OWNER_USER_ID_5) } returns
+            UserResponse(
+                id = OWNER_USER_ID_5,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
 
         val nonExistentStoreId = UUID.randomUUID()
 
@@ -184,11 +190,12 @@ class UpdateStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `스토어 이름만 수정하고 description은 유지할 수 있다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_6) } returns UserResponse(
-            id = OWNER_USER_ID_6,
-            name = "Test Owner",
-            role = UserRole.OWNER
-        )
+        every { userServiceClient.get(OWNER_USER_ID_6) } returns
+            UserResponse(
+                id = OWNER_USER_ID_6,
+                name = "Test Owner",
+                role = UserRole.OWNER,
+            )
 
         val originalDescription = "Keep this description"
 
