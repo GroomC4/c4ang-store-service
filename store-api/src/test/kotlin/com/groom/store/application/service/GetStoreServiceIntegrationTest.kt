@@ -1,25 +1,18 @@
 package com.groom.store.application.service
 
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.application.dto.GetStoreQuery
 import com.groom.store.common.TransactionApplier
 import com.groom.store.common.base.StoreBaseServiceIntegrationTest
 import com.groom.store.common.enums.StoreStatus
 import com.groom.store.common.exception.StoreException
-import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import java.util.UUID
 
-@SpringBootTest
-@ActiveProfiles("test")
 @SqlGroup(
     Sql(scripts = ["/sql/cleanup-get-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
     Sql(scripts = ["/sql/init-get-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
@@ -124,5 +117,39 @@ class GetStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
         assertThat(result.status).isEqualTo(StoreStatus.SUSPENDED)
         assertThat(result.name).isEqualTo("일시정지된 스토어")
         assertThat(result.description).isEqualTo("일시정지됨")
+    }
+
+    @Test
+    fun `ownerUserId로 내 스토어를 성공적으로 조회한다`() {
+        // when - applyPrimaryTransaction으로 replica lag 방지
+        val result =
+            transactionApplier.applyPrimaryTransaction {
+                getStoreService.getMyStore(OWNER_ID_REGISTERED)
+            }
+
+        // then
+        assertThat(result).isNotNull
+        assertThat(result.storeId).isEqualTo(STORE_ID_REGISTERED.toString())
+        assertThat(result.ownerUserId).isEqualTo(OWNER_ID_REGISTERED.toString())
+        assertThat(result.name).isEqualTo("김사장 스토어")
+        assertThat(result.description).isEqualTo("멋진 스토어입니다")
+        assertThat(result.status).isEqualTo(StoreStatus.REGISTERED)
+    }
+
+    @Test
+    fun `스토어가 없는 사용자의 스토어 조회는 실패한다`() {
+        // given - 스토어가 없는 사용자
+        val userIdWithoutStore = UUID.randomUUID()
+
+        // when & then - applyPrimaryTransaction으로 replica lag 방지
+        val exception =
+            assertThrows<StoreException.StoreNotFound> {
+                transactionApplier.applyPrimaryTransaction {
+                    getStoreService.getMyStore(userIdWithoutStore)
+                }
+            }
+
+        // Note: getMyStore passes userId to StoreNotFound(storeId), so we check storeId
+        assertThat(exception.storeId).isEqualTo(userIdWithoutStore)
     }
 }

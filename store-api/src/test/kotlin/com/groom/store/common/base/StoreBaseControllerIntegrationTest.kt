@@ -1,6 +1,7 @@
 package com.groom.store.common.base
 
 import com.groom.store.adapter.out.client.UserServiceClient
+import com.groom.store.common.IntegrationTestBase
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.clearAllMocks
 import org.junit.jupiter.api.BeforeEach
@@ -10,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc
 /**
  * Store Service의 Controller 계층 통합테스트 Base Class
  *
+ * IntegrationTestBase를 상속받아 @SpringBootTest와 Testcontainers 설정을 제공받습니다.
  * Store Service에 필요한 UserServiceClient Mock과 MockMvc를 제공합니다.
  *
  * 사용 방법:
@@ -30,7 +32,7 @@ import org.springframework.test.web.servlet.MockMvc
  * }
  * ```
  */
-abstract class StoreBaseControllerIntegrationTest {
+abstract class StoreBaseControllerIntegrationTest : IntegrationTestBase() {
     @Autowired
     protected lateinit var mockMvc: MockMvc
 

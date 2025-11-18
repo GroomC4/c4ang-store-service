@@ -18,6 +18,9 @@ allprojects {
         mavenLocal() // Maven Local 저장소 추가 (contract-hub 의존성)
         mavenCentral()
         maven {
+            url = uri("https://jitpack.io")
+        }
+        maven {
             url = uri("https://packages.confluent.io/maven/")
         }
         maven {

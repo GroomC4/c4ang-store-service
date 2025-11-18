@@ -1,19 +1,9 @@
-# Testcontainers 설정 (c4ang-platform-core)
-testcontainers:
-  postgres:
-    enabled: true
-    replica-enabled: true
-    schema-location: project:sql/schema.sql
-  redis:
-    enabled: true
-  kafka:
-    enabled: true
-
 logging:
   level:
     root: INFO
     com.groom.store: INFO
     com.groom.platform: DEBUG  # Keep DEBUG for testcontainers troubleshooting
+    org.springframework.boot.autoconfigure: DEBUG  # Auto-configuration debug
 
 google:
   gemini:
@@ -50,7 +40,6 @@ feign:
 spring:
   autoconfigure:
     exclude:
-      - com.groom.platform.datasource.autoconfigure.DataSourceAutoConfiguration
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}

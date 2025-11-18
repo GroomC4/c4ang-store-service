@@ -12,14 +12,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import java.util.UUID
 
-@SpringBootTest
-@ActiveProfiles("test")
 @SqlGroup(
     Sql(scripts = ["/sql/cleanup-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
     Sql(scripts = ["/sql/init-update-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
