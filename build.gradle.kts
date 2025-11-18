@@ -28,6 +28,13 @@ allprojects {
             }
         }
         maven {
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-customer-service")
+            credentials {
+                username = (System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user"))?.toString()
+                password = (System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.token"))?.toString()
+            }
+        }
+        maven {
             url = uri("https://jitpack.io")
         }
     }
