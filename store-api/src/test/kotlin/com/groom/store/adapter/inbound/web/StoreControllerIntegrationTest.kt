@@ -6,7 +6,6 @@ import com.groom.store.adapter.out.client.UserResponse
 import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.common.TransactionApplier
-import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
 import com.groom.store.common.util.IstioHeaderExtractor
 import io.mockk.every
@@ -16,7 +15,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
@@ -28,7 +29,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.UUID
 
-@IntegrationTest
+@SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @DisplayName("스토어 컨트롤러 통합 테스트")
 class StoreControllerIntegrationTest : StoreBaseControllerIntegrationTest() {
@@ -280,7 +282,7 @@ class StoreControllerIntegrationTest : StoreBaseControllerIntegrationTest() {
     @Nested
     @DisplayName("스토어 조회 API 테스트")
     @SqlGroup(
-        Sql(scripts = ["/sql/cleanup-store-controller-get.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        Sql(scripts = ["/sql/cleanup-store-controller-get.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS),
         Sql(scripts = ["/sql/init-store-controller-get.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
         Sql(scripts = ["/sql/cleanup-store-controller-get.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD),
     )
@@ -397,7 +399,8 @@ class StoreControllerIntegrationTest : StoreBaseControllerIntegrationTest() {
                         .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString()),
                 ).andExpect(status().isOk)
                 .andExpect(jsonPath("$.storeId").value(storeId))
-                .andExpect(jsonPath("$.status").value("DELETED"))
+                .andExpect(jsonPath("$.ownerUserId").value(UPDATE_OWNER_USER_ID_1.toString()))
+                .andExpect(jsonPath("$.name").value("Delete Test Store 1"))
                 .andExpect(jsonPath("$.deletedAt").exists())
 
             // 삭제 확인: DB에서 실제로 DELETED 상태로 변경되었는지 확인

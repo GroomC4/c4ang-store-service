@@ -6,7 +6,6 @@ import com.groom.store.adapter.out.persistence.StoreAuditRepository
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.application.dto.RegisterStoreCommand
 import com.groom.store.common.TransactionApplier
-import com.groom.store.common.annotation.IntegrationTest
 import com.groom.store.common.base.StoreBaseServiceIntegrationTest
 import com.groom.store.common.enums.StoreAuditEventType
 import com.groom.store.common.enums.StoreStatus
@@ -17,11 +16,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import java.util.UUID
 
-@IntegrationTest
+@SpringBootTest
+@ActiveProfiles("test")
 @SqlGroup(
     Sql(scripts = ["/sql/cleanup-register-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
     Sql(scripts = ["/sql/init-register-store-service.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
