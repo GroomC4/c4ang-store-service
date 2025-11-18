@@ -10,7 +10,7 @@ plugins {
 // Platform Core 버전 관리
 val platformCoreVersion = "1.2.3"
 // Contract Hub 버전 관리
-val contractHubVersion = "1.0.0-SNAPSHOT"
+val contractHubVersion = "1.0.0"
 
 dependencies {
     // Kotlin
@@ -31,8 +31,8 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:7.5.1")
     implementation("io.confluent:kafka-schema-registry-client:7.5.1")
 
-    // Contract Hub (Avro 스키마) - Maven Local에서 가져오기
-    implementation("com.c4ang:c4ang-contract-hub:$contractHubVersion")
+    // Contract Hub (Avro 스키마) - Jitpack에서 가져오기
+    implementation("com.github.GroomC4:c4ang-contract-hub:$contractHubVersion")
 
     // Spring Cloud BOM (Spring Boot 3.3.4와 호환)
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.3"))
