@@ -10,7 +10,7 @@ plugins {
 // Platform Core 버전 관리
 val platformCoreVersion = "1.2.3"
 // Contract Hub 버전 관리
-val contractHubVersion = "1.0.0-SNAPSHOT"
+val contractHubVersion = "1.0.0"
 
 dependencies {
     // Kotlin
