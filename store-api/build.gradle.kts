@@ -63,11 +63,11 @@ dependencies {
     // Platform Core - Testcontainers Starter (PostgreSQL, Redis, Kafka, Schema Registry 자동 구성)
     testImplementation("com.groom.platform:testcontainers-starter:$platformCoreVersion")
 
+    // TODO: Jitpack 저장소 문제 해결 후 활성화
     // Spring Cloud Contract Stub Runner (Consumer Contract Test)
-    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
-
+    // testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
     // Customer Service Contract Stubs (from Jitpack)
-    testImplementation("com.groom:customer-service-contract-stubs:1.0.0")
+    // testImplementation("com.groom:customer-service-contract-stubs:1.0.0")
 }
 
 // 모든 Test 태스크에 공통 설정 적용
