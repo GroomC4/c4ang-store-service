@@ -53,7 +53,24 @@ spring:
         schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
       naming:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# TestContainers 설정 (자동으로 Docker 컨테이너 시작)
+testcontainers:
+  postgres:
+    enabled: true
+    image: postgres:15-alpine
+    database-name: testdb
+  redis:
+    enabled: true
+    image: redis:7-alpine
+  kafka:
+    enabled: true
+    image: confluentinc/cp-kafka:7.5.0
