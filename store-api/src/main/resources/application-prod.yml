@@ -58,14 +58,14 @@ security:
 
 feign:
   clients:
-    store-service:
-      url: ${STORE_SERVICE_URL:http://store-service:8081}
+    user-service:
+      url: ${USER_SERVICE_URL:http://store-service:8081}
       connect-timeout: 3000
       read-timeout: 3000
       logger-level: basic
   client:
     config:
-      store-service:
+      user-service:
         connectTimeout: 3000
         readTimeout: 3000
         loggerLevel: basic

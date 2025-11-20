@@ -1,7 +1,7 @@
 package com.groom.store.domain.service
 
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.common.exception.UserException
+import com.groom.store.domain.model.UserRole
 import com.groom.store.domain.port.LoadUserPort
 import org.springframework.stereotype.Service
 import java.util.UUID

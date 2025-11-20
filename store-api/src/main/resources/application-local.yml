@@ -55,8 +55,8 @@ security:
 
 feign:
   clients:
-    store-service:
-      url: http://localhost:8082
+    user-service:
+      url: http://localhost:8080
       connect-timeout: 10000
       read-timeout: 10000
       logger-level: full

@@ -1,5 +1,6 @@
 package com.groom.store.adapter.out.client
 
+import com.groom.ecommerce.customer.api.avro.UserInternalResponse
 import java.util.UUID
 
 /**
@@ -16,5 +17,5 @@ interface UserServiceClient {
     /**
      * 특정 유저 정보 조회
      */
-    fun get(sellerId: UUID): UserResponse
+    fun get(sellerId: UUID): UserInternalResponse
 }

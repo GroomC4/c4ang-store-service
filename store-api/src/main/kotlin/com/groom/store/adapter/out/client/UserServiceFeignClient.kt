@@ -1,13 +1,16 @@
 package com.groom.store.adapter.out.client
 
+import com.groom.ecommerce.customer.api.avro.UserInternalResponse
 import org.springframework.cloud.openfeign.FeignClient
-import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import java.util.UUID
 
 /**
  * user 서비스와 통신하기 위한 Feign Client
+ *
+ * c4ang-contract-hub의 Avro 스키마로 생성된 클래스를 사용하여
+ * Customer Service의 Internal API와 통신합니다.
  *
  * 테스트 환경에서는 Spring Cloud Contract Stub Runner를 통해 WireMock stub과 통신합니다.
  */
@@ -19,27 +22,14 @@ interface UserServiceFeignClient : UserServiceClient {
     /**
      * 특정 유저 정보 조회
      *
-     * @param sellerId 판매자 ID
-     * @return 유저 정보
+     * Customer Service의 Internal User API를 호출합니다.
+     * 엔드포인트: GET /internal/v1/users/{userId}
+     *
+     * @param sellerId 판매자 ID (UUID)
+     * @return UserInternalResponse - Avro 스키마로 정의된 사용자 정보
      */
-    @GetMapping("/api/internal/users/{sellerId}")
+    @GetMapping("/internal/v1/users/{sellerId}")
     override fun get(
         @PathVariable sellerId: UUID,
-    ): UserResponse
-}
-
-/**
- * 유저 정보 응답 DTO
- */
-data class UserResponse(
-    val id: UUID,
-    val name: String,
-    val role: UserRole,
-)
-
-enum class UserRole {
-    CUSTOMER,
-    OWNER,
-    MANAGER,
-    MASTER,
+    ): UserInternalResponse
 }

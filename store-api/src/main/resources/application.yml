@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8081
 
 spring:
   application:
@@ -58,17 +58,15 @@ springdoc:
 # Feign Client 설정 (FeignClientProperties로 관리)
 feign:
   clients:
-    store-service:
-      url: http://localhost:8082
+    user-service:
+      url: http://localhost:8080
       connect-timeout: 5000
       read-timeout: 5000
-      logger-level: basic
+      logger-level: full
   client:
     config:
-      default:
-        connectTimeout: 5000
-        readTimeout: 5000
-        loggerLevel: basic
+      user-service:
+        loggerLevel: full
 
 # Kafka Producer 설정
 kafka:

@@ -1,7 +1,5 @@
 package com.groom.store.application.service
 
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.application.dto.UpdateStoreCommand
 import com.groom.store.common.TransactionApplier
@@ -52,13 +50,6 @@ class UpdateStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `스토어 소유자가 자신의 스토어를 성공적으로 수정한다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = OWNER_USER_ID_1,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val command =
             UpdateStoreCommand(
                 storeId = STORE_ID_1,
