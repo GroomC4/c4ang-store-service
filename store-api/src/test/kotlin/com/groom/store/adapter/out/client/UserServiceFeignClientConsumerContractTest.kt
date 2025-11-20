@@ -9,7 +9,6 @@ import feign.jackson.JacksonEncoder
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner
@@ -43,21 +42,20 @@ import java.util.UUID
  * - Contract 변경 시 이 테스트가 실패하면 두 서비스 간 호환성 문제를 의미합니다
  *
  * Stub 로드 전략:
- * - REMOTE 모드를 사용하여 GitHub Packages에서 Contract Stub 다운로드
- * - CI 환경과 로컬 환경 모두에서 동일하게 동작
- * - customer-service가 GitHub Packages에 Stub을 발행해야 함
+ * - LOCAL 모드를 사용하여 mavenLocal()에서 Contract Stub 로드
+ * - customer-service에서 `./gradlew publishToMavenLocal` 실행 필요
+ * - 명시적 버전 지정으로 안정적인 Contract 검증
  *
- * 현재 상태:
- * - customer-service가 아직 Contract Stub을 GitHub Packages에 발행하지 않음
- * - 임시로 @Disabled 처리하여 CI 빌드가 실패하지 않도록 함
- * - TODO: customer-service가 Stub 발행 후 @Disabled 제거 필요
+ * 사전 준비:
+ * ```bash
+ * cd c4ang-customer-service
+ * ./gradlew :customer-api:publishToMavenLocal
+ * ```
  */
-@Disabled("customer-service의 Contract Stub이 GitHub Packages에 발행되면 활성화")
 @SpringJUnitConfig
 @AutoConfigureStubRunner(
     ids = ["com.groom:customer-service-contract-stubs:+:stubs:8090"],
-    stubsMode = StubRunnerProperties.StubsMode.REMOTE,
-    repositoryRoot = "https://maven.pkg.github.com/GroomC4/c4ang-customer-service"
+    stubsMode = StubRunnerProperties.StubsMode.LOCAL
 )
 @ActiveProfiles("test")
 @DisplayName("UserServiceFeignClient Consumer Contract 테스트")
