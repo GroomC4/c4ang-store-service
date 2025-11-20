@@ -1,12 +1,9 @@
 package com.groom.store.adapter.inbound.web
 
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.common.TransactionApplier
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
 import com.groom.store.common.util.IstioHeaderExtractor
-import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -44,13 +41,6 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("DELETE /api/v1/stores/{storeId} - 인증된 Owner가 자신의 스토어를 성공적으로 삭제한다")
     fun testSuccessfulStoreDeletion() {
         // given: SQL에서 생성한 Owner User와 Store 사용
-        every { userServiceClient.get(UPDATE_OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = UPDATE_OWNER_USER_ID_1,
-                name = "Update Owner User 1",
-                role = UserRole.OWNER,
-            )
-
         val storeId = "11111111-2222-3333-4444-555555555571"
 
         // when & then
@@ -77,13 +67,6 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("DELETE /api/v1/stores/{storeId} - 다른 Owner의 스토어 삭제 시도 시 403 Forbidden을 반환한다")
     fun testDeleteOtherOwnerStore() {
         // given: SQL에서 생성한 User 3으로, User 1의 Store 삭제 시도
-        every { userServiceClient.get(UPDATE_OWNER_USER_ID_3) } returns
-            UserResponse(
-                id = UPDATE_OWNER_USER_ID_3,
-                name = "Update Owner User 3",
-                role = UserRole.OWNER,
-            )
-
         val user1StoreId = "11111111-2222-3333-4444-555555555571"
 
         // when & then
@@ -100,13 +83,6 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("DELETE /api/v1/stores/{storeId} - 존재하지 않는 스토어 삭제 시도 시 404 Not Found를 반환한다")
     fun testDeleteNonExistentStore() {
         // given
-        every { userServiceClient.get(UPDATE_OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = UPDATE_OWNER_USER_ID_1,
-                name = "Update Owner User 1",
-                role = UserRole.OWNER,
-            )
-
         val nonExistentStoreId =
             UUID
                 .randomUUID()
@@ -140,13 +116,6 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("DELETE /api/v1/stores/{storeId} - 이미 삭제된 스토어 재삭제 시도 시 409 Conflict를 반환한다")
     fun testDeleteAlreadyDeletedStore() {
         // given: 이미 삭제된 스토어 (SQL에서 DELETED 상태로 생성)
-        every { userServiceClient.get(UPDATE_OWNER_USER_ID_2) } returns
-            UserResponse(
-                id = UPDATE_OWNER_USER_ID_2,
-                name = "Update Owner User 2",
-                role = UserRole.OWNER,
-            )
-
         val deletedStoreId = "22222222-2222-3333-4444-555555555572"
 
         // when & then

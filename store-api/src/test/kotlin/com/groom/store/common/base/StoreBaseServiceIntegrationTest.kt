@@ -1,6 +1,5 @@
 package com.groom.store.common.base
 
-import com.groom.store.adapter.out.client.UserServiceClient
 import com.groom.store.common.IntegrationTestBase
 import com.groom.store.domain.port.PublishEventPort
 import com.ninjasquad.springmockk.MockkBean
@@ -11,7 +10,8 @@ import org.junit.jupiter.api.BeforeEach
 /**
  * Store Service의 Service 계층 통합테스트 Base Class
  *
- * Store Service에 필요한 UserServiceClient와 PublishEventPort Mock을 제공합니다.
+ * Store Service에 필요한 PublishEventPort Mock을 제공합니다.
+ * UserServiceClient는 MockUserServiceClient가 자동으로 주입됩니다.
  *
  * 사용 방법:
  * ```kotlin
@@ -19,22 +19,13 @@ import org.junit.jupiter.api.BeforeEach
  * class RegisterStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
  *     @Test
  *     fun test() {
- *         every { userServiceClient.get(any()) } returns UserResponse(...)
+ *         // MockUserServiceClient가 자동으로 TestUserRegistry의 사용자 정보를 반환합니다.
  *         // 테스트 로직
  *     }
  * }
  * ```
  */
 abstract class StoreBaseServiceIntegrationTest : IntegrationTestBase() {
-    /**
-     * UserServiceClient Mock
-     *
-     * Store Service의 모든 통합테스트에서 공유됩니다.
-     * 각 테스트에서 every { userServiceClient.get(...) }로 동작을 정의하세요.
-     */
-    @MockkBean
-    protected lateinit var userServiceClient: UserServiceClient
-
     /**
      * PublishEventPort Mock
      *

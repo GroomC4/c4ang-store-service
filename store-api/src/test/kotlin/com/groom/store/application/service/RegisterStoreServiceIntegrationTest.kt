@@ -1,7 +1,5 @@
 package com.groom.store.application.service
 
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.adapter.out.persistence.StoreAuditRepository
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.application.dto.RegisterStoreCommand
@@ -11,7 +9,6 @@ import com.groom.store.common.enums.StoreAuditEventType
 import com.groom.store.common.enums.StoreStatus
 import com.groom.store.common.exception.StoreException
 import com.groom.store.common.exception.UserException
-import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -52,13 +49,6 @@ class RegisterStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `OWNER 역할을 가진 사용자가 스토어를 성공적으로 등록한다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = OWNER_USER_ID_1,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_1,
@@ -131,13 +121,6 @@ class RegisterStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `이미 스토어를 보유한 OWNER가 중복 등록을 시도하면 실패한다`() {
         // given - OWNER_USER_ID_2는 이미 EXISTING_STORE_ID를 소유
-        every { userServiceClient.get(OWNER_USER_ID_2) } returns
-            UserResponse(
-                id = OWNER_USER_ID_2,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         // DEBUG: Verify the store exists before calling the service (use primary to avoid replication lag)
         transactionApplier.applyPrimaryTransaction {
             val existingStore = storeRepository.findByOwnerUserId(OWNER_USER_ID_2)
@@ -204,13 +187,6 @@ class RegisterStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `등록된 스토어가 DB에 올바르게 저장되고 모든 필드가 정확하게 유지된다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_3) } returns
-            UserResponse(
-                id = OWNER_USER_ID_3,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_3,
@@ -256,13 +232,6 @@ class RegisterStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `description이 null인 경우에도 스토어가 정상적으로 등록된다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_4) } returns
-            UserResponse(
-                id = OWNER_USER_ID_4,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_4,
@@ -286,13 +255,6 @@ class RegisterStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `스토어 등록 시 감사 로그가 생성된다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_5) } returns
-            UserResponse(
-                id = OWNER_USER_ID_5,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val command =
             RegisterStoreCommand(
                 ownerUserId = OWNER_USER_ID_5,

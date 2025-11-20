@@ -61,6 +61,59 @@ object TestUserRegistry {
             role = UserRole.OWNER,
         )
 
+    // DeleteStoreServiceIntegrationTest용 사용자들
+    val DELETE_OWNER_USER_1 =
+        TestUser(
+            id = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+            name = "Delete Owner User 1",
+            role = UserRole.OWNER,
+        )
+
+    val DELETE_OWNER_USER_2 =
+        TestUser(
+            id = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+            name = "Delete Owner User 2",
+            role = UserRole.OWNER,
+        )
+
+    val DELETE_OWNER_USER_3 =
+        TestUser(
+            id = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+            name = "Delete Owner User 3",
+            role = UserRole.OWNER,
+        )
+
+    val DELETE_OWNER_USER_4 =
+        TestUser(
+            id = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+            name = "Delete Owner User 4",
+            role = UserRole.OWNER,
+        )
+
+    val DELETE_OWNER_USER_5 =
+        TestUser(
+            id = UUID.fromString("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+            name = "Delete Owner User 5",
+            role = UserRole.OWNER,
+        )
+
+    // RegisterStoreServiceIntegrationTest용 추가 사용자들
+    val REGISTER_OWNER_USER_2 =
+        TestUser(
+            id = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+            name = "Register Owner User 2",
+            role = UserRole.OWNER,
+        )
+
+    val REGISTER_OWNER_USER_5 =
+        TestUser(
+            id = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff"),
+            name = "Register Owner User 5",
+            role = UserRole.OWNER,
+        )
+
+    // UpdateStoreServiceIntegrationTest용 사용자들은 DELETE와 동일한 UUID 사용
+
     // 전체 사용자 맵
     private val userMap: Map<UUID, TestUser> =
         listOf(
@@ -71,6 +124,13 @@ object TestUserRegistry {
             UPDATE_OWNER_USER_1,
             UPDATE_OWNER_USER_2,
             UPDATE_OWNER_USER_3,
+            DELETE_OWNER_USER_1,
+            DELETE_OWNER_USER_2,
+            DELETE_OWNER_USER_3,
+            DELETE_OWNER_USER_4,
+            DELETE_OWNER_USER_5,
+            REGISTER_OWNER_USER_2,
+            REGISTER_OWNER_USER_5,
         ).associateBy { it.id }
 
     /**

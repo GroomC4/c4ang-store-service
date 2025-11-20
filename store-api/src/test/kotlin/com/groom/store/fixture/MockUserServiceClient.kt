@@ -18,6 +18,7 @@ import java.util.*
  */
 @Component
 @Profile("test")
+@org.springframework.context.annotation.Primary
 class MockUserServiceClient : UserServiceClient {
 
     override fun get(sellerId: UUID): UserInternalResponse {

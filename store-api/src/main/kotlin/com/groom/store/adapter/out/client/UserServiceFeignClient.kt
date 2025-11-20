@@ -1,7 +1,9 @@
 package com.groom.store.adapter.out.client
 
 import com.groom.ecommerce.customer.api.avro.UserInternalResponse
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import java.util.UUID
@@ -12,12 +14,14 @@ import java.util.UUID
  * c4ang-contract-hub의 Avro 스키마로 생성된 클래스를 사용하여
  * Customer Service의 Internal API와 통신합니다.
  *
- * 테스트 환경에서는 Spring Cloud Contract Stub Runner를 통해 WireMock stub과 통신합니다.
+ * 테스트 환경에서는 MockUserServiceClient가 사용됩니다.
  */
 @FeignClient(
     name = "user-service",
     url = "\${feign.clients.user-service.url:http://localhost:8081}",
 )
+@Profile("!test")
+@ConditionalOnMissingBean(UserServiceClient::class)
 interface UserServiceFeignClient : UserServiceClient {
     /**
      * 특정 유저 정보 조회

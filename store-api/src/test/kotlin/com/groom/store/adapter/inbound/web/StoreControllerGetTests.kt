@@ -1,10 +1,7 @@
 package com.groom.store.adapter.inbound.web
 
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
 import com.groom.store.common.util.IstioHeaderExtractor
-import io.mockk.every
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -63,13 +60,6 @@ class StoreControllerGetTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("GET /api/v1/stores/mine - 인증된 Owner가 자신의 스토어를 조회한다")
     fun testGetMyStore() {
         // given: SQL에서 생성한 Owner User와 Store 사용
-        every { userServiceClient.get(UPDATE_OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = UPDATE_OWNER_USER_ID_1,
-                name = "Update Owner User 1",
-                role = UserRole.OWNER,
-            )
-
         // when & then
         mockMvc
             .perform(
@@ -85,12 +75,6 @@ class StoreControllerGetTests : StoreBaseControllerIntegrationTest() {
     fun testGetMyStore_NoStore() {
         // given: 스토어가 없는 Owner
         val ownerWithoutStore = UUID.randomUUID()
-        every { userServiceClient.get(ownerWithoutStore) } returns
-            UserResponse(
-                id = ownerWithoutStore,
-                name = "Owner Without Store",
-                role = UserRole.OWNER,
-            )
 
         // when & then
         mockMvc
