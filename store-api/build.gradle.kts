@@ -4,6 +4,8 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.jpa")
+    id("org.springframework.cloud.contract") version "4.1.4"
+    `maven-publish`
     jacoco
 }
 
@@ -11,6 +13,8 @@ plugins {
 val platformCoreVersion = "1.2.9"
 // Contract Hub 버전 관리
 val contractHubVersion = "1.0.0"
+// Spring Cloud Contract 버전
+val springCloudContractVersion = "4.1.4"
 
 dependencies {
     // Internal modules
@@ -65,6 +69,11 @@ dependencies {
 
     // Platform Core - Testcontainers Starter (PostgreSQL, Redis, Kafka, Schema Registry 자동 구성)
     testImplementation("com.groom.platform:testcontainers-starter:$platformCoreVersion")
+
+    // Spring Cloud Contract (Provider-side testing)
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:$springCloudContractVersion")
+    testImplementation("io.rest-assured:rest-assured:5.3.2")
+    testImplementation("io.rest-assured:spring-mock-mvc:5.3.2")
 
     // Spring Cloud Contract Stub Runner (Consumer Contract Test)
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
@@ -206,4 +215,36 @@ tasks.jacocoTestCoverageVerification {
 
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
+}
+
+// Spring Cloud Contract 설정
+contracts {
+    testMode.set(org.springframework.cloud.contract.verifier.config.TestMode.MOCKMVC)
+    baseClassForTests.set("com.groom.store.common.ContractTestBase")
+    contractsDslDir.set(file("src/test/resources/contracts"))
+}
+
+// Contract Stub 발행 설정 (Consumer가 사용할 수 있도록 GitHub Packages에 발행)
+publishing {
+    publications {
+        create<MavenPublication>("stubs") {
+            groupId = "com.groom"
+            artifactId = "store-service-contract-stubs"
+            version = project.version.toString()
+
+            // Contract Stub JAR을 발행
+            artifact(tasks.named("verifierStubsJar"))
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-store-service")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
+            }
+        }
+    }
 }
