@@ -1,14 +1,11 @@
 package com.groom.store.application.service
 
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.application.dto.DeleteStoreCommand
 import com.groom.store.common.TransactionApplier
 import com.groom.store.common.base.StoreBaseServiceIntegrationTest
 import com.groom.store.common.enums.StoreStatus
 import com.groom.store.common.exception.StoreException
-import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -50,13 +47,6 @@ class DeleteStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `스토어 소유자가 자신의 스토어를 성공적으로 삭제한다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = OWNER_USER_ID_1,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val command =
             DeleteStoreCommand(
                 storeId = STORE_ID_1,
@@ -83,13 +73,6 @@ class DeleteStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `스토어 소유자가 아닌 사용자가 스토어를 삭제하려고 하면 실패한다`() {
         // given - STORE_ID_2는 OWNER_USER_ID_2 소유이고, OWNER_USER_ID_3가 삭제 시도
-        every { userServiceClient.get(OWNER_USER_ID_3) } returns
-            UserResponse(
-                id = OWNER_USER_ID_3,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val command =
             DeleteStoreCommand(
                 storeId = STORE_ID_2,
@@ -115,13 +98,6 @@ class DeleteStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `존재하지 않는 스토어를 삭제하려고 하면 실패한다`() {
         // given
-        every { userServiceClient.get(OWNER_USER_ID_4) } returns
-            UserResponse(
-                id = OWNER_USER_ID_4,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val nonExistentStoreId = UUID.randomUUID()
 
         val command =
@@ -142,13 +118,6 @@ class DeleteStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
     @Test
     fun `이미 삭제된 스토어를 다시 삭제하려고 하면 실패한다`() {
         // given - STORE_ID_5_ALREADY_DELETED는 이미 DELETED 상태
-        every { userServiceClient.get(OWNER_USER_ID_5) } returns
-            UserResponse(
-                id = OWNER_USER_ID_5,
-                name = "Test Owner",
-                role = UserRole.OWNER,
-            )
-
         val command =
             DeleteStoreCommand(
                 storeId = STORE_ID_5_ALREADY_DELETED,

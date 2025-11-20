@@ -1,10 +1,7 @@
 package com.groom.store.adapter.inbound.web
 
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
 import com.groom.store.common.util.IstioHeaderExtractor
-import io.mockk.every
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -34,13 +31,6 @@ class StoreControllerUpdateTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("PATCH /api/v1/stores/{storeId} - 인증된 Owner가 자신의 스토어를 수정하면 200 OK와 수정된 스토어 정보를 반환한다")
     fun testSuccessfulStoreUpdate() {
         // given: SQL에서 생성한 User와 Store 사용
-        every { userServiceClient.get(UPDATE_OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = UPDATE_OWNER_USER_ID_1,
-                name = "Update Owner User 1",
-                role = UserRole.OWNER,
-            )
-
         val storeId = "11111111-2222-3333-4444-555555555571"
 
         // 스토어 수정 요청
@@ -71,13 +61,6 @@ class StoreControllerUpdateTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("PATCH /api/v1/stores/{storeId} - 다른 Owner의 스토어 수정 시도 시 403 Forbidden을 반환한다")
     fun testUpdateOtherOwnerStore() {
         // given: SQL에서 생성한 User 3으로, User 1의 Store 수정 시도
-        every { userServiceClient.get(UPDATE_OWNER_USER_ID_3) } returns
-            UserResponse(
-                id = UPDATE_OWNER_USER_ID_3,
-                name = "Update Owner User 3",
-                role = UserRole.OWNER,
-            )
-
         val user1StoreId = "11111111-2222-3333-4444-555555555571"
 
         // User 1의 스토어 수정 시도
@@ -131,13 +114,6 @@ class StoreControllerUpdateTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("PATCH /api/v1/stores/{storeId} - 존재하지 않는 스토어 수정 시도 시 404 Not Found를 반환한다")
     fun testUpdateNonExistentStore() {
         // given: 존재하지 않는 스토어 ID
-        every { userServiceClient.get(UPDATE_OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = UPDATE_OWNER_USER_ID_1,
-                name = "Update Owner User 1",
-                role = UserRole.OWNER,
-            )
-
         val nonExistentStoreId =
             UUID
                 .randomUUID()

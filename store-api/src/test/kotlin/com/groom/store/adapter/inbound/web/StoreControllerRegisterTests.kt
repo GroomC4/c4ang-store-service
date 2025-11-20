@@ -2,11 +2,8 @@ package com.groom.store.adapter.inbound.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.groom.store.adapter.inbound.web.dto.RegisterStoreRequest
-import com.groom.store.adapter.out.client.UserResponse
-import com.groom.store.adapter.out.client.UserRole
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
 import com.groom.store.common.util.IstioHeaderExtractor
-import io.mockk.every
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,13 +37,6 @@ class StoreControllerRegisterTests : StoreBaseControllerIntegrationTest() {
     @DisplayName("POST /api/v1/stores - 인증된 Owner가 스토어를 등록하면 201 Created와 스토어 정보를 반환한다")
     fun testSuccessfulStoreRegistration() {
         // given: SQL에서 생성한 Owner User 사용 (OWNER_USER_ID_1)
-        every { userServiceClient.get(OWNER_USER_ID_1) } returns
-            UserResponse(
-                id = OWNER_USER_ID_1,
-                name = "Owner User 1",
-                role = UserRole.OWNER,
-            )
-
         val registerStoreRequest =
             RegisterStoreRequest(
                 name = "새로운 테크 스토어",
