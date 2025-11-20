@@ -40,11 +40,17 @@ import java.util.UUID
  * 주의:
  * - customer-service의 Contract Stub이 로컬에 발행되어 있어야 합니다
  * - Contract 변경 시 이 테스트가 실패하면 두 서비스 간 호환성 문제를 의미합니다
+ *
+ * Stub 로드 전략:
+ * - REMOTE 모드를 사용하여 GitHub Packages에서 Contract Stub 다운로드
+ * - CI 환경과 로컬 환경 모두에서 동일하게 동작
+ * - customer-service가 GitHub Packages에 Stub을 발행해야 함
  */
 @SpringJUnitConfig
 @AutoConfigureStubRunner(
     ids = ["com.groom:customer-service-contract-stubs:+:stubs:8090"],
-    stubsMode = StubRunnerProperties.StubsMode.LOCAL
+    stubsMode = StubRunnerProperties.StubsMode.REMOTE,
+    repositoryRoot = "https://maven.pkg.github.com/GroomC4/c4ang-customer-service"
 )
 @ActiveProfiles("test")
 @DisplayName("UserServiceFeignClient Consumer Contract 테스트")
