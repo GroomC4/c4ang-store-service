@@ -15,12 +15,13 @@ allprojects {
     version = "0.0.1-SNAPSHOT"
 
     repositories {
-        mavenLocal() // Maven Local 저장소 추가 (contract-hub 의존성)
         mavenCentral()
         maven {
+            name = "스키마 레지스트리"
             url = uri("https://packages.confluent.io/maven/")
         }
         maven {
+            name = "c4ang-platform-core github packages"
             url = uri("https://maven.pkg.github.com/GroomC4/c4ang-platform-core")
             credentials {
                 username = (System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user"))?.toString()
@@ -28,6 +29,7 @@ allprojects {
             }
         }
         maven {
+            name = "c4ang-customer-service contract stub github packages"
             url = uri("https://maven.pkg.github.com/GroomC4/c4ang-customer-service")
             credentials {
                 username = (System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user"))?.toString()
@@ -35,6 +37,7 @@ allprojects {
             }
         }
         maven {
+            name = "c4ang-contract-hub jitpack"
             url = uri("https://jitpack.io")
         }
     }
