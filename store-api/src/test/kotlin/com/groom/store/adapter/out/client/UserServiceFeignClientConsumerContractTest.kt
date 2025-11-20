@@ -43,7 +43,6 @@ import java.util.UUID
  *
  * Stub 로드 전략:
  * - REMOTE 모드를 사용하여 GitHub Packages에서 Contract Stub 다운로드
- * - 명시적 버전(1.0.8) 지정으로 안정적인 Contract 검증
  * - CI/로컬 환경 모두에서 동일하게 동작
  *
  * GitHub Packages 인증:
@@ -53,7 +52,7 @@ import java.util.UUID
  */
 @SpringJUnitConfig
 @AutoConfigureStubRunner(
-    ids = ["com.groom:customer-service-contract-stubs:1.0.8:stubs:8090"],
+    ids = ["com.groom:customer-service-contract-stubs:+:stubs:8090"],
     stubsMode = StubRunnerProperties.StubsMode.REMOTE,
     repositoryRoot = "https://maven.pkg.github.com/GroomC4/c4ang-customer-service"
 )
