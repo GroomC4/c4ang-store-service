@@ -19,14 +19,20 @@ import org.springframework.cloud.openfeign.support.SpringMvcContract
 import java.util.UUID
 
 /**
- * UserServiceFeignClient Contract Test
+ * UserServiceFeignClient Unit Test
  *
- * WireMock을 사용하여 customer-service의 internal API contract를 검증합니다.
- * Feign 클라이언트를 직접 구성하여 전체 Spring Context 로드 없이 테스트합니다.
- * c4ang-contract-hub의 Avro 스키마를 기반으로 한 응답을 검증합니다.
+ * 목적: FeignClient 자체의 동작을 검증하는 빠른 단위 테스트
+ *
+ * - WireMock을 사용하여 HTTP 통신 및 데이터 직렬화/역직렬화 검증
+ * - Spring Context 없이 독립적으로 실행 (빠른 피드백)
+ * - FeignClient 설정 및 에러 핸들링 검증
+ * - Avro 스키마 기반 응답 파싱 검증
+ *
+ * 주의: 이 테스트는 customer-service와의 실제 계약을 검증하지 않습니다.
+ * 실제 API 계약 검증은 UserServiceFeignClientConsumerContractTest를 참고하세요.
  */
-@DisplayName("UserServiceFeignClient Contract 테스트")
-class UserServiceFeignClientContractTest {
+@DisplayName("UserServiceFeignClient 단위 테스트")
+class UserServiceFeignClientUnitTest {
 
     private lateinit var wireMockServer: WireMockServer
     private lateinit var userServiceFeignClient: UserServiceFeignClient
@@ -81,33 +87,35 @@ class UserServiceFeignClientContractTest {
     }
 
     @Test
-    @DisplayName("특정 유저 정보를 조회할 수 있다")
-    fun `should get user information by seller id`() {
+    @DisplayName("FeignClient가 HTTP 요청을 올바르게 전송하고 응답을 Avro 객체로 역직렬화한다")
+    fun `should deserialize HTTP response to Avro UserInternalResponse`() {
         // given
-        val sellerId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
+        val userId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
 
         // when
-        val result = userServiceFeignClient.get(sellerId)
+        val result = userServiceFeignClient.get(userId)
 
-        // then
+        // then - Avro 객체로 올바르게 역직렬화 검증
         result shouldNotBe null
-        result.getUserId() shouldBe sellerId.toString()
-        result.getUsername() shouldNotBe null
-        result.getRole() shouldNotBe null
+        result.getUserId() shouldBe userId.toString()
+        result.getUsername() shouldBe "test_user"
+        result.getEmail() shouldBe "test@example.com"
+        result.getIsActive() shouldBe true
         result.getProfile() shouldNotBe null
         result.getProfile().getFullName() shouldBe "Test User"
+        result.getProfile().getPhoneNumber() shouldBe "+82-10-1234-5678"
     }
 
     @Test
-    @DisplayName("OWNER 역할을 가진 유저 정보를 조회할 수 있다")
-    fun `should get user information with OWNER role`() {
+    @DisplayName("FeignClient가 Avro Enum 타입을 올바르게 파싱한다")
+    fun `should correctly parse Avro enum type for UserRole`() {
         // given
-        val sellerId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
+        val userId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
 
         // when
-        val result = userServiceFeignClient.get(sellerId)
+        val result = userServiceFeignClient.get(userId)
 
-        // then
+        // then - Avro Enum 타입 검증
         result.getRole() shouldBe ContractUserRole.OWNER
     }
 }

@@ -19,14 +19,27 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import java.util.UUID
 
 /**
- * UserServiceFeignClient with Spring Cloud Contract Stub Runner Test
+ * UserServiceFeignClient Consumer Contract Test
  *
- * customer-service에서 발행한 Contract Stub을 사용하여
- * UserServiceFeignClient의 명세를 검증합니다.
+ * 목적: customer-service와의 API 계약(Contract)을 검증하는 Consumer Contract Test
  *
- * 이 테스트는 customer-service가 로컬 Maven 레포지토리에 발행한
- * Contract Stub JAR를 자동으로 다운로드하여 WireMock 서버를 실행하고,
- * Feign Client를 직접 생성하여 테스트합니다.
+ * Spring Cloud Contract의 Consumer-Driven Contract Testing:
+ * - customer-service(Provider)가 발행한 Contract Stub을 사용
+ * - store-service(Consumer) 관점에서 API 계약 준수 여부 검증
+ * - customer-service의 실제 API 변경 사항을 조기에 감지
+ *
+ * 동작 방식:
+ * 1. customer-service의 Contract Stub JAR를 로컬 Maven에서 로드
+ * 2. Stub Runner가 WireMock 서버를 8090 포트에서 실행
+ * 3. Contract에 정의된 요청/응답 시나리오 검증
+ *
+ * 차이점:
+ * - Unit Test: FeignClient 자체 동작 검증 (빠름, 독립적)
+ * - Contract Test: customer-service와의 실제 계약 검증 (느림, 의존적)
+ *
+ * 주의:
+ * - customer-service의 Contract Stub이 로컬에 발행되어 있어야 합니다
+ * - Contract 변경 시 이 테스트가 실패하면 두 서비스 간 호환성 문제를 의미합니다
  */
 @SpringJUnitConfig
 @AutoConfigureStubRunner(
@@ -34,8 +47,8 @@ import java.util.UUID
     stubsMode = StubRunnerProperties.StubsMode.LOCAL
 )
 @ActiveProfiles("test")
-@DisplayName("UserServiceFeignClient with Contract Stub 테스트")
-class UserServiceFeignClientWithStubRunnerTest {
+@DisplayName("UserServiceFeignClient Consumer Contract 테스트")
+class UserServiceFeignClientConsumerContractTest {
 
     private lateinit var userServiceFeignClient: UserServiceFeignClient
 
@@ -55,15 +68,17 @@ class UserServiceFeignClientWithStubRunnerTest {
     }
 
     @Test
-    @DisplayName("Contract Stub을 통해 유효한 사용자 정보를 조회할 수 있다")
-    fun `should get user information from contract stub`() {
-        // given - customer-service contract에 정의된 사용자 ID
-        val userId = UUID.fromString("750e8400-e29b-41d4-a716-446655440001")
+    @DisplayName("[Contract 검증] customer-service가 정의한 사용자 조회 API 계약을 준수한다")
+    fun `should comply with customer service contract for getting user by id`() {
+        // given - customer-service의 Contract에 정의된 사용자 ID
+        // Contract 파일: should_return_user_when_id_exists.yml
+        val contractDefinedUserId = UUID.fromString("750e8400-e29b-41d4-a716-446655440001")
 
-        // when
-        val result = userServiceFeignClient.get(userId)
+        // when - Contract에 정의된 요청 실행
+        val result = userServiceFeignClient.get(contractDefinedUserId)
 
-        // then - contract에 정의된 응답 검증
+        // then - Contract에 정의된 응답 스펙 검증
+        // Contract는 customer-service의 실제 API 명세를 반영합니다
         result shouldNotBe null
         result.getUserId() shouldBe "750e8400-e29b-41d4-a716-446655440001"
         result.getUsername() shouldBe "고객테스트"
@@ -71,24 +86,26 @@ class UserServiceFeignClientWithStubRunnerTest {
         result.getRole() shouldBe ContractUserRole.CUSTOMER
         result.getIsActive() shouldBe true
 
-        // profile 정보 검증
+        // profile 정보도 Contract에 정의된 대로 검증
         result.getProfile() shouldNotBe null
         result.getProfile().getFullName() shouldBe "고객테스트"
         result.getProfile().getPhoneNumber() shouldBe "010-1111-2222"
     }
 
     @Test
-    @DisplayName("Contract Stub을 통해 존재하지 않는 사용자 조회시 404 에러가 발생한다")
-    fun `should return 404 for non-existent user from contract stub`() {
-        // given - 존재하지 않는 사용자 ID (contract에 정의되지 않은 ID)
+    @DisplayName("[Contract 검증] 존재하지 않는 사용자 조회 시 404 응답을 받는다")
+    fun `should receive 404 response when user not found as per contract`() {
+        // given - Contract에 정의되지 않은 사용자 ID
+        // Contract는 이 경우 404를 반환하도록 정의되어 있습니다
         val nonExistentUserId = UUID.randomUUID()
 
-        // when & then
+        // when & then - Contract에 정의된 에러 응답 검증
         try {
             userServiceFeignClient.get(nonExistentUserId)
-            throw AssertionError("예외가 발생해야 합니다")
+            throw AssertionError("Contract에 따라 404 예외가 발생해야 합니다")
         } catch (e: Exception) {
-            // FeignException.NotFound 또는 404 관련 예외 예상
+            // Contract에 정의된 404 응답 검증
+            // customer-service의 실제 에러 응답과 동일한 형식
             e.message shouldNotBe null
         }
     }
