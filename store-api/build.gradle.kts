@@ -217,7 +217,7 @@ tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 }
 
-// Spring Cloud Contract 설정
+// Spring Cloud Contract 설정 (Provider Contract Test)
 contracts {
     testMode.set(org.springframework.cloud.contract.verifier.config.TestMode.MOCKMVC)
     baseClassForTests.set("com.groom.store.common.ContractTestBase")
@@ -243,8 +243,20 @@ publishing {
             url = uri("https://maven.pkg.github.com/GroomC4/c4ang-store-service")
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
-                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.token") as String?
             }
         }
     }
 }
+
+// Contract 관리 전략:
+// - Provider Contract (HTTP API 제공): Spring Cloud Contract로 관리
+//   - Store API Contract 정의 및 검증
+//   - Contract Stub을 GitHub Packages에 발행
+//   - 테스트: ContractTestBase 기반 자동 생성 테스트
+// - Provider Contract (Kafka 이벤트 발행): c4ang-contract-hub의 Avro 스키마로 관리
+//   - StoreCreatedEvent, StoreInfoUpdatedEvent, StoreDeletedEvent 등
+//   - Schema Registry를 통해 스키마 버전 관리
+// - Consumer Contract (HTTP API 소비): Spring Cloud Contract Stub Runner 사용
+//   - customer-service API 소비 시 발행된 Contract Stub으로 검증
+//   - 테스트: UserServiceFeignClientConsumerContractTest.kt

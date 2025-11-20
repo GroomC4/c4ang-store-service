@@ -1,0 +1,38 @@
+description: Store API - 인증된 Owner가 스토어 등록
+name: should_register_store_successfully
+request:
+  method: POST
+  url: /api/v1/stores
+  headers:
+    Content-Type: application/json
+    X-User-Id: "750e8400-e29b-41d4-a716-446655440010"
+    X-User-Role: "OWNER"
+  body:
+    name: "New Contract Store"
+    description: "Newly created store via contract"
+response:
+  status: 201
+  headers:
+    Content-Type: application/json
+  body:
+    storeId: "750e8400-e29b-41d4-a716-446655440110"
+    name: "New Contract Store"
+    description: "Newly created store via contract"
+    status: "REGISTERED"
+    createdAt: "2024-01-01T00:00:00"
+  matchers:
+    body:
+      - path: $.storeId
+        type: by_regex
+        value: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+      - path: $.name
+        type: by_equality
+        value: "New Contract Store"
+      - path: $.description
+        type: by_equality
+        value: "Newly created store via contract"
+      - path: $.status
+        type: by_equality
+        value: "REGISTERED"
+      - path: $.createdAt
+        type: by_type

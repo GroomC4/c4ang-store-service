@@ -1,0 +1,35 @@
+description: Store API - 인증된 Owner가 자신의 스토어 수정
+name: should_update_store_successfully
+request:
+  method: PATCH
+  url: /api/v1/stores/750e8400-e29b-41d4-a716-446655440103
+  headers:
+    Content-Type: application/json
+    X-User-Id: "750e8400-e29b-41d4-a716-446655440003"
+    X-User-Role: "OWNER"
+  body:
+    name: "Updated Store Name"
+    description: "Updated description"
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    storeId: "750e8400-e29b-41d4-a716-446655440103"
+    name: "Updated Store Name"
+    description: "Updated description"
+    status: "REGISTERED"
+    updatedAt: "2024-01-01T00:00:00"
+  matchers:
+    body:
+      - path: $.storeId
+        type: by_equality
+        value: "750e8400-e29b-41d4-a716-446655440103"
+      - path: $.name
+        type: by_equality
+        value: "Updated Store Name"
+      - path: $.description
+        type: by_equality
+        value: "Updated description"
+      - path: $.updatedAt
+        type: by_type
