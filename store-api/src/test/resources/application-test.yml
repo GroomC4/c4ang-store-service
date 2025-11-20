@@ -21,7 +21,7 @@ aws:
 feign:
   clients:
     user-service:
-      url: http://localhost:8081
+      url: http://localhost:8090  # Spring Cloud Contract Stub Runner 포트
       connect-timeout: 5000
       read-timeout: 5000
       logger-level: full

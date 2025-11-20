@@ -5,6 +5,7 @@ import com.groom.ecommerce.customer.api.avro.UserProfileInternal
 import com.groom.store.adapter.out.client.UserServiceClient
 import com.groom.store.domain.model.UserRole
 import org.springframework.context.annotation.Profile
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -18,7 +19,7 @@ import java.util.*
  */
 @Component
 @Profile("test")
-@org.springframework.context.annotation.Primary
+@Primary
 class MockUserServiceClient : UserServiceClient {
 
     override fun get(sellerId: UUID): UserInternalResponse {

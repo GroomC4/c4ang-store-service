@@ -15,6 +15,7 @@ allprojects {
     version = "0.0.1-SNAPSHOT"
 
     repositories {
+        mavenLocal() // Contract Stub을 로컬에서 가져오기 위함
         mavenCentral()
         maven {
             name = "스키마 레지스트리"
