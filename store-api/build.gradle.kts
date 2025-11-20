@@ -13,6 +13,9 @@ val platformCoreVersion = "1.2.9"
 val contractHubVersion = "1.0.0"
 
 dependencies {
+    // Internal modules
+    implementation(project(":store-events"))
+
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
