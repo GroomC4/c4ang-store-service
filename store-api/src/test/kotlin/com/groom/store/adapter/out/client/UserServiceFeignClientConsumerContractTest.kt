@@ -16,7 +16,6 @@ import org.springframework.cloud.openfeign.support.SpringMvcContract
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import java.util.UUID
-import com.groom.ecommerce.customer.api.avro.UserRole as ContractUserRole
 
 /**
  * UserServiceFeignClient Consumer Contract Test
@@ -93,7 +92,7 @@ class UserServiceFeignClientConsumerContractTest {
         result.userId shouldBe "750e8400-e29b-41d4-a716-446655440001"
         result.username shouldBe "고객테스트"
         result.email shouldBe "customer@example.com"
-        result.role shouldBe ContractUserRole.CUSTOMER
+        result.role shouldBe "CUSTOMER"
         result.isActive shouldBe true
 
         // profile 정보도 Contract에 정의된 대로 검증

@@ -2,9 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.2.20" apply false
-    id("org.jetbrains.kotlin.plugin.spring") version "2.2.20" apply false
-    id("org.jetbrains.kotlin.plugin.jpa") version "2.2.20" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.0.21" apply false
+    id("org.jetbrains.kotlin.plugin.spring") version "2.0.21" apply false
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.0.21" apply false
     id("org.springframework.boot") version "3.3.4" apply false
     id("io.spring.dependency-management") version "1.1.6" apply false
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0" apply false
@@ -12,10 +12,23 @@ plugins {
 
 allprojects {
     group = "com.groom"
-    version = "0.0.1-SNAPSHOT"
+    // GitHub Actions에서 태그를 푸시하면 GITHUB_REF_NAME 환경변수로 버전을 가져옴
+    // 예: v1.0.0 -> 1.0.0
+    version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: "0.0.1-SNAPSHOT"
 
-    // ✅ repositories 설정은 settings.gradle.kts에서 중앙 관리
-    // dependencyResolutionManagement를 통해 모든 프로젝트에 자동 적용됨
+    repositories {
+        mavenCentral()
+
+        // GitHub Packages for platform-core
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-platform-core")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 
     extensions.findByType<KotlinJvmProjectExtension>()?.apply {
         jvmToolchain(21)

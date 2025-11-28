@@ -1,7 +1,5 @@
 package com.groom.store.configuration.kafka
 
-import io.confluent.kafka.serializers.KafkaAvroSerializer
-import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -10,11 +8,12 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
+import org.springframework.kafka.support.serializer.JsonSerializer
 
 /**
  * Kafka Producer 설정
  *
- * Avro 직렬화를 사용하여 타입 안전한 이벤트 발행
+ * JSON 직렬화를 사용하여 이벤트 발행
  */
 @Configuration
 class KafkaProducerConfig(
@@ -26,7 +25,7 @@ class KafkaProducerConfig(
             mutableMapOf<String, Any>(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaProperties.bootstrapServers,
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to JsonSerializer::class.java,
                 ProducerConfig.ACKS_CONFIG to kafkaProperties.producer.acks,
                 ProducerConfig.RETRIES_CONFIG to kafkaProperties.producer.retries,
                 ProducerConfig.BATCH_SIZE_CONFIG to kafkaProperties.producer.batchSize,
@@ -35,7 +34,6 @@ class KafkaProducerConfig(
                 ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to kafkaProperties.producer.maxInFlightRequestsPerConnection,
                 ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to kafkaProperties.producer.enableIdempotence,
                 ProducerConfig.COMPRESSION_TYPE_CONFIG to kafkaProperties.producer.compressionType,
-                KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG to kafkaProperties.schemaRegistry.url,
             )
 
         return DefaultKafkaProducerFactory(configProps)
@@ -53,7 +51,6 @@ class KafkaProducerConfig(
 data class KafkaProperties(
     var bootstrapServers: String = "localhost:9092",
     val producer: ProducerProperties = ProducerProperties(),
-    val schemaRegistry: SchemaRegistryProperties = SchemaRegistryProperties(),
     val topics: TopicProperties = TopicProperties(),
 )
 
@@ -66,12 +63,6 @@ data class ProducerProperties(
     var maxInFlightRequestsPerConnection: Int = 5,
     var enableIdempotence: Boolean = true,
     var compressionType: String = "snappy",
-    var keySerializer: String = "org.apache.kafka.common.serialization.StringSerializer",
-    var valueSerializer: String = "io.confluent.kafka.serializers.KafkaAvroSerializer",
-)
-
-data class SchemaRegistryProperties(
-    var url: String = "http://localhost:8081",
 )
 
 data class TopicProperties(
