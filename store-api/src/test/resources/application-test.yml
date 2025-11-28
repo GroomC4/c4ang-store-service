@@ -34,12 +34,12 @@ spring:
   autoconfigure:
     exclude:
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
-# Custom Kafka Producer 설정 (KafkaProducerConfig.kt에서 사용)
+# Kafka Topic 설정 (커스텀)
 kafka:
-  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  topics:
+    store-info-updated: store.info.updated
+    store-deleted: store.deleted
 
 # TestContainers 설정 (자동으로 Docker 컨테이너 시작)
 testcontainers:

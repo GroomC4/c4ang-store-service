@@ -1,7 +1,7 @@
 package com.groom.store.adapter.out.event
 
 import com.groom.store.adapter.out.event.dto.StoreInfoUpdatedEventDto
-import com.groom.store.configuration.kafka.KafkaProperties
+import com.groom.store.configuration.kafka.KafkaTopicProperties
 import com.groom.store.domain.event.StoreCreatedEvent
 import com.groom.store.domain.event.StoreDeletedEvent
 import com.groom.store.domain.event.StoreInfoUpdatedEvent
@@ -20,7 +20,7 @@ private val logger = KotlinLogging.logger {}
 @Component
 class StoreEventAdapter(
     private val kafkaTemplate: KafkaTemplate<String, Any>,
-    private val kafkaProperties: KafkaProperties,
+    private val kafkaTopicProperties: KafkaTopicProperties,
 ) : PublishEventPort {
     override fun publishStoreCreated(event: StoreCreatedEvent) {
         logger.info { "Publishing store.created event: storeId=${event.storeId}" }
@@ -30,7 +30,7 @@ class StoreEventAdapter(
     }
 
     override fun publishStoreInfoUpdated(event: StoreInfoUpdatedEvent) {
-        val topic = kafkaProperties.topics.storeInfoUpdated
+        val topic = kafkaTopicProperties.storeInfoUpdated
         val partitionKey = event.storeId.toString()
 
         // 변경된 필드 목록 생성

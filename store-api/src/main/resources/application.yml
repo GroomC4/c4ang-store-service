@@ -14,6 +14,14 @@ spring:
       hibernate:
         format_sql: true  # SQL 포맷팅 (logback에서 레벨 제어)
     show-sql: false  # Console SQL 출력 비활성화 (logback으로 제어)
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+      retries: 3
+      batch-size: 16KB
+      buffer-size: 32MB
+      compression-type: snappy
 
 # ====================================
 # 기본 로그 레벨 (프로필 미지정 시)
@@ -68,22 +76,8 @@ feign:
       user-service:
         loggerLevel: full
 
-# Kafka Producer 설정
+# Kafka Topic 설정 (커스텀)
 kafka:
-  bootstrap-servers: localhost:9092
-  producer:
-    acks: all
-    retries: 3
-    batch-size: 16384
-    linger-ms: 10
-    buffer-memory: 33554432
-    max-in-flight-requests-per-connection: 5
-    enable-idempotence: true
-    compression-type: snappy
-    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-    value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-  schema-registry:
-    url: http://localhost:8081
   topics:
     store-info-updated: store.info.updated
     store-deleted: store.deleted
