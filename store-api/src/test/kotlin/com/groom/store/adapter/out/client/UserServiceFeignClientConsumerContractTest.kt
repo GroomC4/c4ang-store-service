@@ -51,7 +51,7 @@ import java.util.UUID
  */
 @SpringJUnitConfig
 @AutoConfigureStubRunner(
-    ids = ["com.groom:customer-service-contract-stubs:1.0.7:stubs:8090"],
+    ids = ["com.groom:customer-service-contract-stubs:1.0.11:stubs:8090"],
     stubsMode = StubRunnerProperties.StubsMode.REMOTE,
     repositoryRoot = "https://maven.pkg.github.com/GroomC4/c4ang-customer-service",
 )

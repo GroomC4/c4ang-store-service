@@ -36,14 +36,10 @@ spring:
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    producer:
-      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-      properties:
-        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
-    consumer:
-      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-      properties:
-        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+
+# Custom Kafka Producer 설정 (KafkaProducerConfig.kt에서 사용)
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
 # TestContainers 설정 (자동으로 Docker 컨테이너 시작)
 testcontainers:

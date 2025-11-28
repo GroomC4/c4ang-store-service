@@ -38,8 +38,8 @@ class UserServiceFeignClientUnitTest {
 
     @BeforeEach
     fun setup() {
-        // WireMock 서버 시작
-        wireMockServer = WireMockServer(WireMockConfiguration.options().port(8081))
+        // WireMock 서버 시작 (동적 포트 할당으로 충돌 방지)
+        wireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())
         wireMockServer.start()
 
         // ObjectMapper with Kotlin module
@@ -52,7 +52,7 @@ class UserServiceFeignClientUnitTest {
                 .contract(SpringMvcContract())
                 .encoder(JacksonEncoder(objectMapper))
                 .decoder(JacksonDecoder(objectMapper))
-                .target(UserServiceFeignClient::class.java, "http://localhost:8081")
+                .target(UserServiceFeignClient::class.java, "http://localhost:${wireMockServer.port()}")
 
         // Stub 설정 - UserInternalDto 스키마에 맞춘 응답
         wireMockServer.stubFor(
