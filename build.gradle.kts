@@ -14,34 +14,8 @@ allprojects {
     group = "com.groom"
     version = "0.0.1-SNAPSHOT"
 
-    repositories {
-        mavenLocal() // Contract Stub을 로컬에서 가져오기 위함
-        mavenCentral()
-        maven {
-            name = "스키마 레지스트리"
-            url = uri("https://packages.confluent.io/maven/")
-        }
-        maven {
-            name = "c4ang-platform-core github packages"
-            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-platform-core")
-            credentials {
-                username = (System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user"))?.toString()
-                password = (System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.token"))?.toString()
-            }
-        }
-        maven {
-            name = "c4ang-customer-service contract stub github packages"
-            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-customer-service")
-            credentials {
-                username = (System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user"))?.toString()
-                password = (System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.token"))?.toString()
-            }
-        }
-        maven {
-            name = "c4ang-contract-hub jitpack"
-            url = uri("https://jitpack.io")
-        }
-    }
+    // ✅ repositories 설정은 settings.gradle.kts에서 중앙 관리
+    // dependencyResolutionManagement를 통해 모든 프로젝트에 자동 적용됨
 
     extensions.findByType<KotlinJvmProjectExtension>()?.apply {
         jvmToolchain(21)

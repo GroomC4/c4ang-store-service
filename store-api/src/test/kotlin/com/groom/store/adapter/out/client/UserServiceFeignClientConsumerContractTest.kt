@@ -2,7 +2,6 @@ package com.groom.store.adapter.out.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.groom.ecommerce.customer.api.avro.UserRole as ContractUserRole
 import feign.Feign
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
@@ -17,6 +16,7 @@ import org.springframework.cloud.openfeign.support.SpringMvcContract
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import java.util.UUID
+import com.groom.ecommerce.customer.api.avro.UserRole as ContractUserRole
 
 /**
  * UserServiceFeignClient Consumer Contract Test
@@ -52,14 +52,13 @@ import java.util.UUID
  */
 @SpringJUnitConfig
 @AutoConfigureStubRunner(
-    ids = ["com.groom:customer-service-contract-stubs:+:stubs:8090"],
+    ids = ["com.groom:customer-service-contract-stubs:1.0.7:stubs:8090"],
     stubsMode = StubRunnerProperties.StubsMode.REMOTE,
-    repositoryRoot = "https://maven.pkg.github.com/GroomC4/c4ang-customer-service"
+    repositoryRoot = "https://maven.pkg.github.com/GroomC4/c4ang-customer-service",
 )
 @ActiveProfiles("test")
 @DisplayName("UserServiceFeignClient Consumer Contract 테스트")
 class UserServiceFeignClientConsumerContractTest {
-
     private lateinit var userServiceFeignClient: UserServiceFeignClient
 
     @BeforeEach
@@ -67,14 +66,15 @@ class UserServiceFeignClientConsumerContractTest {
         val objectMapper = ObjectMapper().registerKotlinModule()
 
         // Feign Client를 Stub Runner가 실행한 WireMock 서버에 연결
-        userServiceFeignClient = Feign.builder()
-            .contract(SpringMvcContract())
-            .encoder(JacksonEncoder(objectMapper))
-            .decoder(JacksonDecoder(objectMapper))
-            .requestInterceptor { template ->
-                template.header("Content-Type", "application/json")
-            }
-            .target(UserServiceFeignClient::class.java, "http://localhost:8090")
+        userServiceFeignClient =
+            Feign
+                .builder()
+                .contract(SpringMvcContract())
+                .encoder(JacksonEncoder(objectMapper))
+                .decoder(JacksonDecoder(objectMapper))
+                .requestInterceptor { template ->
+                    template.header("Content-Type", "application/json")
+                }.target(UserServiceFeignClient::class.java, "http://localhost:8090")
     }
 
     @Test
@@ -90,16 +90,16 @@ class UserServiceFeignClientConsumerContractTest {
         // then - Contract에 정의된 응답 스펙 검증
         // Contract는 customer-service의 실제 API 명세를 반영합니다
         result shouldNotBe null
-        result.getUserId() shouldBe "750e8400-e29b-41d4-a716-446655440001"
-        result.getUsername() shouldBe "고객테스트"
-        result.getEmail() shouldBe "customer@example.com"
-        result.getRole() shouldBe ContractUserRole.CUSTOMER
-        result.getIsActive() shouldBe true
+        result.userId shouldBe "750e8400-e29b-41d4-a716-446655440001"
+        result.username shouldBe "고객테스트"
+        result.email shouldBe "customer@example.com"
+        result.role shouldBe ContractUserRole.CUSTOMER
+        result.isActive shouldBe true
 
         // profile 정보도 Contract에 정의된 대로 검증
-        result.getProfile() shouldNotBe null
-        result.getProfile().getFullName() shouldBe "고객테스트"
-        result.getProfile().getPhoneNumber() shouldBe "010-1111-2222"
+        result.profile shouldNotBe null
+        result.profile.fullName shouldBe "고객테스트"
+        result.profile.phoneNumber shouldBe "010-1111-2222"
     }
 
     @Test

@@ -90,6 +90,10 @@ tasks.withType<Test> {
     systemProperty("user.timezone", "KST")
     jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
 
+    // Stub Runner가 GitHub Packages에서 Stub을 다운로드하기 위한 인증 설정
+    systemProperty("stubrunner.username", System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") ?: "")
+    systemProperty("stubrunner.password", System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.token") ?: "")
+
     // 테스트 실행 로깅
     testLogging {
         events("passed", "skipped", "failed")
@@ -227,23 +231,25 @@ contracts {
 // Contract Stub 발행 설정 (Consumer가 사용할 수 있도록 GitHub Packages에 발행)
 publishing {
     publications {
-        create<MavenPublication>("stubs") {
+        create<MavenPublication>("maven") {
             groupId = "com.groom"
             artifactId = "store-service-contract-stubs"
             version = project.version.toString()
-
-            // Contract Stub JAR을 발행
             artifact(tasks.named("verifierStubsJar"))
         }
     }
-
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-store-service")
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-maven-packages")
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
-                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.token") as String?
+                username = providers.environmentVariable("GITHUB_ACTOR")
+                    .orElse(providers.gradleProperty("gpr.user"))
+                    .getOrElse("")
+                password = providers.environmentVariable("MAVEN_PUBLISH_TOKEN")
+                    .orElse(providers.environmentVariable("GITHUB_TOKEN"))
+                    .orElse(providers.gradleProperty("gpr.token"))
+                    .getOrElse("")
             }
         }
     }
