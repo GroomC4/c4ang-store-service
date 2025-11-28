@@ -1,6 +1,6 @@
 package com.groom.store.adapter.out.client
 
-import com.groom.ecommerce.customer.api.avro.UserInternalResponse
+import com.groom.store.adapter.out.client.dto.UserInternalDto
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.context.annotation.Profile
@@ -11,7 +11,6 @@ import java.util.UUID
 /**
  * user 서비스와 통신하기 위한 Feign Client
  *
- * c4ang-contract-hub의 Avro 스키마로 생성된 클래스를 사용하여
  * Customer Service의 Internal API와 통신합니다.
  *
  * 테스트 환경에서는 MockUserServiceClient가 사용됩니다.
@@ -30,10 +29,10 @@ interface UserServiceFeignClient : UserServiceClient {
      * 엔드포인트: GET /internal/v1/users/{userId}
      *
      * @param sellerId 판매자 ID (UUID)
-     * @return UserInternalResponse - Avro 스키마로 정의된 사용자 정보
+     * @return UserInternalDto - 사용자 정보
      */
     @GetMapping("/internal/v1/users/{sellerId}")
     override fun get(
         @PathVariable sellerId: UUID,
-    ): UserInternalResponse
+    ): UserInternalDto
 }

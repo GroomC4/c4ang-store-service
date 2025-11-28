@@ -10,9 +10,7 @@ plugins {
 }
 
 // Platform Core 버전 관리
-val platformCoreVersion = "1.2.9"
-// Contract Hub 버전 관리
-val contractHubVersion = "1.0.0"
+val platformCoreVersion = "2.0.3"
 // Spring Cloud Contract 버전
 val springCloudContractVersion = "4.1.4"
 
@@ -35,11 +33,6 @@ dependencies {
 
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("io.confluent:kafka-avro-serializer:7.5.1")
-    implementation("io.confluent:kafka-schema-registry-client:7.5.1")
-
-    // Contract Hub (Avro 스키마) - Jitpack에서 가져오기
-    implementation("com.github.GroomC4:c4ang-contract-hub:$contractHubVersion")
 
     // Spring Cloud BOM (Spring Boot 3.3.4와 호환)
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.3"))
@@ -47,7 +40,7 @@ dependencies {
     // Spring Cloud OpenFeign (버전은 BOM에서 관리)
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
-    // Logging방ㅇ
+    // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
 
     // Redisson (Redis 클라이언트 with 원자적 연산 지원)
@@ -57,8 +50,8 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
 
-    // Platform Core - DataSource Starter (Primary-Replica 자동 라우팅)
-    implementation("com.groom.platform:datasource-starter:$platformCoreVersion")
+    // Platform Core - DataSource (프로덕션 환경)
+    implementation("io.github.groomc4:platform-core:$platformCoreVersion")
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -67,8 +60,8 @@ dependencies {
     testImplementation("io.mockk:mockk:1.14.5")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 
-    // Platform Core - Testcontainers Starter (PostgreSQL, Redis, Kafka, Schema Registry 자동 구성)
-    testImplementation("com.groom.platform:testcontainers-starter:$platformCoreVersion")
+    // Platform Core - Testcontainers (테스트 전용)
+    testImplementation("io.github.groomc4:testcontainers-starter:$platformCoreVersion")
 
     // Spring Cloud Contract (Provider-side testing)
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:$springCloudContractVersion")
@@ -89,6 +82,10 @@ tasks.withType<Test> {
 
     systemProperty("user.timezone", "KST")
     jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
+    // Stub Runner가 GitHub Packages에서 Stub을 다운로드하기 위한 인증 설정
+    systemProperty("stubrunner.username", System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") ?: "")
+    systemProperty("stubrunner.password", System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.token") ?: "")
 
     // 테스트 실행 로깅
     testLogging {
@@ -240,23 +237,11 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-store-service")
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-packages-hub")
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
-                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.token") as String?
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
             }
         }
     }
 }
-
-// Contract 관리 전략:
-// - Provider Contract (HTTP API 제공): Spring Cloud Contract로 관리
-//   - Store API Contract 정의 및 검증
-//   - Contract Stub을 GitHub Packages에 발행
-//   - 테스트: ContractTestBase 기반 자동 생성 테스트
-// - Provider Contract (Kafka 이벤트 발행): c4ang-contract-hub의 Avro 스키마로 관리
-//   - StoreCreatedEvent, StoreInfoUpdatedEvent, StoreDeletedEvent 등
-//   - Schema Registry를 통해 스키마 버전 관리
-// - Consumer Contract (HTTP API 소비): Spring Cloud Contract Stub Runner 사용
-//   - customer-service API 소비 시 발행된 Contract Stub으로 검증
-//   - 테스트: UserServiceFeignClientConsumerContractTest.kt

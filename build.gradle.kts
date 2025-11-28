@@ -2,9 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.2.20" apply false
-    id("org.jetbrains.kotlin.plugin.spring") version "2.2.20" apply false
-    id("org.jetbrains.kotlin.plugin.jpa") version "2.2.20" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.0.21" apply false
+    id("org.jetbrains.kotlin.plugin.spring") version "2.0.21" apply false
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.0.21" apply false
     id("org.springframework.boot") version "3.3.4" apply false
     id("io.spring.dependency-management") version "1.1.6" apply false
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0" apply false
@@ -12,34 +12,21 @@ plugins {
 
 allprojects {
     group = "com.groom"
-    version = "0.0.1-SNAPSHOT"
+    // GitHub Actions에서 태그를 푸시하면 GITHUB_REF_NAME 환경변수로 버전을 가져옴
+    // 예: v1.0.0 -> 1.0.0
+    version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: "0.0.1-SNAPSHOT"
 
     repositories {
-        mavenLocal() // Contract Stub을 로컬에서 가져오기 위함
         mavenCentral()
+
+        // GitHub Packages for platform-core
         maven {
-            name = "스키마 레지스트리"
-            url = uri("https://packages.confluent.io/maven/")
-        }
-        maven {
-            name = "c4ang-platform-core github packages"
+            name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/GroomC4/c4ang-platform-core")
             credentials {
-                username = (System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user"))?.toString()
-                password = (System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.token"))?.toString()
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
-        }
-        maven {
-            name = "c4ang-customer-service contract stub github packages"
-            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-customer-service")
-            credentials {
-                username = (System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user"))?.toString()
-                password = (System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.token"))?.toString()
-            }
-        }
-        maven {
-            name = "c4ang-contract-hub jitpack"
-            url = uri("https://jitpack.io")
         }
     }
 
