@@ -8,11 +8,14 @@
 *.iml
 .vscode
 
-# Gradle build outputs
-build/
-*/build/
-.gradle/
+# Gradle
+.gradle
 */.gradle/
+# build/ 디렉토리는 JAR 복사를 위해 포함 (GitHub Actions에서 빌드된 JAR 사용)
+!store-api/build/libs/*.jar
+
+# Claude
+.claude
 
 # Logs
 logs/
@@ -28,20 +31,15 @@ logs/
 .env.*
 
 # Documentation
+docs/
 *.md
-!README.md
-
-# Docker
-Dockerfile*
-docker-compose*.yml
-.dockerignore
 
 # CI/CD
 .github/
 .gitlab-ci.yml
 Jenkinsfile
 
-# Kubernetes manifests (if any)
+# Kubernetes manifests
 k8s/
 helm/
 

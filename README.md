@@ -1,116 +1,162 @@
-# store-service
-스토어 관리
+# Store Service
 
-## Contract 관리 전략
+C4ang 이커머스 플랫폼의 **스토어 관리 마이크로서비스**입니다.
 
-store-service는 **분산형 Contract 관리 전략**을 따릅니다. 각 서비스가 자신의 Contract를 관리하며, c4ang-contract-hub는 Avro 스키마만 중앙 관리합니다.
+## 서비스 책임
 
-### 1. Provider Contract (HTTP API 제공)
+- 스토어 등록, 조회, 수정, 삭제 (CRUD)
+- 스토어 소유자 권한 검증
+- 스토어 상태 관리 (REGISTERED, SUSPENDED, HIDDEN, DELETED)
+- 스토어 평점 관리
+- 스토어 변경 이력 감사 로그 기록
+- 도메인 이벤트 발행 (Kafka)
 
-store-service는 Store API를 제공하며, **Spring Cloud Contract**를 사용하여 Provider Contract Test를 수행합니다.
+## 기술 스택
 
-**제공 API:**
-- `GET /api/v1/stores/{storeId}`: 스토어 조회
-- `GET /api/v1/stores/mine`: 내 스토어 조회
-- `POST /api/v1/stores`: 스토어 등록
-- `PATCH /api/v1/stores/{storeId}`: 스토어 수정
-- `DELETE /api/v1/stores/{storeId}`: 스토어 삭제
+| 구분 | 기술 |
+|------|------|
+| Language | Kotlin 2.0, JDK 21 |
+| Framework | Spring Boot 3.3 |
+| Database | PostgreSQL (Primary-Replica) |
+| Cache | Redis (Redisson) |
+| Message Broker | Apache Kafka |
+| API Documentation | SpringDoc OpenAPI |
+| Build Tool | Gradle 8.x (Kotlin DSL) |
+| Container | Docker |
 
-**Contract 파일 위치:**
+## 프로젝트 구조
+
 ```
-store-api/src/test/resources/contracts/store-api/
-├── should_get_store_by_id.yml
-├── should_get_my_store.yml
-├── should_register_store_successfully.yml
-├── should_update_store_successfully.yml
-├── should_delete_store_successfully.yml
-└── should_return_404_when_store_not_found.yml
+store-api/
+└── src/main/kotlin/com/groom/store/
+    ├── adapter/                    # 외부 시스템 연동
+    │   ├── inbound/web/           # REST API Controller
+    │   └── out/
+    │       ├── persistence/       # JPA Repository
+    │       ├── event/             # Kafka Producer
+    │       └── client/            # Feign Client (customer-service)
+    │
+    ├── application/               # 애플리케이션 서비스
+    │   ├── service/               # Use Case 구현
+    │   ├── dto/                   # Command, Result DTO
+    │   └── event/                 # 도메인 이벤트 핸들러
+    │
+    ├── domain/                    # 도메인 계층 (비즈니스 로직)
+    │   ├── model/                 # Entity, Value Object
+    │   ├── service/               # 도메인 서비스
+    │   ├── port/                  # 포트 인터페이스
+    │   └── event/                 # 도메인 이벤트
+    │
+    ├── common/                    # 공통 유틸리티
+    │   ├── exception/             # 예외 처리
+    │   ├── idempotency/           # 멱등성 처리
+    │   └── enums/                 # 공통 enum
+    │
+    └── configuration/             # 설정 클래스
+        ├── kafka/                 # Kafka 설정
+        ├── feign/                 # Feign Client 설정
+        └── jpa/                   # JPA/DataSource 설정
 ```
 
-**Contract Test 실행:**
+## API 엔드포인트
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| POST | `/api/v1/stores` | 스토어 등록 |
+| GET | `/api/v1/stores/{storeId}` | 스토어 조회 |
+| GET | `/api/v1/stores/mine` | 내 스토어 조회 |
+| PATCH | `/api/v1/stores/{storeId}` | 스토어 수정 |
+| DELETE | `/api/v1/stores/{storeId}` | 스토어 삭제 |
+
+## 발행 이벤트 (Kafka)
+
+| 이벤트 | Topic | 설명 |
+|--------|-------|------|
+| StoreCreatedEvent | - | 스토어 생성 시 (내부 처리) |
+| StoreInfoUpdatedEvent | `store.info.updated` | 스토어 정보 수정 시 |
+| StoreDeletedEvent | `store.deleted` | 스토어 삭제 시 |
+
+## 외부 서비스 의존성
+
+| 서비스 | 용도 |
+|--------|------|
+| customer-service | 사용자 정보 조회 (권한 검증) |
+
+## 환경 설정
+
+### 프로필
+
+| 프로필 | 용도 | 설명 |
+|--------|------|------|
+| (default) | 로컬 개발 | H2/PostgreSQL 직접 연결 |
+| test | 테스트 | Testcontainers 사용 |
+| dev | k3d 개발환경 | Kubernetes 서비스 이름 사용 |
+| prod | 운영환경 | 환경변수 기반 설정 |
+
+### 주요 환경변수 (prod)
+
+```
+DB_MASTER_URL, DB_REPLICA_URL, DB_USERNAME, DB_PASSWORD
+REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+KAFKA_BOOTSTRAP_SERVERS
+CUSTOMER_SERVICE_URL
+JWT_SECRET
+```
+
+## 빌드 및 실행
+
 ```bash
-# Contract Test 실행 (Provider 측 검증)
+# 빌드 (테스트 포함)
+./gradlew build
+
+# 빌드 (테스트 제외)
+./gradlew build -x test
+
+# 단위 테스트
+./gradlew :store-api:test
+
+# 통합 테스트 (Testcontainers)
+./gradlew :store-api:integrationTest
+
+# Contract 테스트
 ./gradlew :store-api:contractTest
 
-# Contract Stub 생성 및 로컬 발행
-./gradlew :store-api:publishToMavenLocal
+# 로컬 실행
+./gradlew bootRun
+```
 
-# Contract Stub GitHub Packages 발행 (태그 푸시 시 CI에서 자동 실행)
+## Docker
+
+```bash
+# 빌드
+docker build \
+  --build-arg GITHUB_ACTOR=<username> \
+  --build-arg GITHUB_TOKEN=<token> \
+  -t store-service .
+
+# 실행
+docker run -p 8082:8082 store-service
+```
+
+## Contract 테스트
+
+### Provider Contract (제공하는 API)
+
+- Spring Cloud Contract를 사용하여 API 계약 검증
+- Contract 파일: `store-api/src/test/resources/contracts/`
+- Stub 발행: GitHub Packages (`com.groom:store-service-contract-stubs`)
+
+### Consumer Contract (소비하는 API)
+
+- customer-service의 사용자 조회 API 계약 검증
+- Stub Runner를 통한 Consumer Contract Test
+
+```bash
+# Contract Stub 발행
 ./gradlew :store-api:publish
 ```
 
-**Consumer 사용 방법:**
-다른 서비스(product-service, order-service 등)에서 Store API를 호출할 때:
+## 관련 저장소
 
-```kotlin
-// build.gradle.kts
-testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
-
-// Contract Test
-@AutoConfigureStubRunner(
-    ids = ["com.groom:store-service-contract-stubs:+:stubs:8080"],
-    stubsMode = StubRunnerProperties.StubsMode.LOCAL
-)
-class StoreApiContractTest {
-    @Test
-    fun `should call store api successfully`() {
-        // Contract Stub을 통한 테스트
-    }
-}
-```
-
-### 2. Provider Contract (Kafka 이벤트 발행)
-
-store-service는 스토어 도메인 이벤트를 Kafka를 통해 발행하며, 이벤트 스키마는 **c4ang-contract-hub**에서 Avro 형식으로 관리됩니다.
-
-**발행 이벤트:**
-- `StoreCreatedEvent`: 스토어 생성 시 발행
-- `StoreInfoUpdatedEvent`: 스토어 정보 수정 시 발행
-- `StoreDeletedEvent`: 스토어 삭제 시 발행
-
-**스키마 관리:**
-- Repository: [c4ang-contract-hub](https://github.com/GroomC4/c4ang-contract-hub)
-- 버전 관리: Confluent Schema Registry
-- 참조: [스토어 정보 업데이트 이벤트 플로우](https://github.com/GroomC4/c4ang-contract-hub/blob/main/event-flows/store-management/update-store-info.md)
-
-### 3. Consumer Contract (HTTP API 소비)
-
-store-service는 다른 서비스의 HTTP API를 소비하며, **Spring Cloud Contract Stub Runner**를 사용하여 계약을 검증합니다.
-
-**소비 API:**
-- `customer-service`: 사용자 정보 조회 API
-
-**계약 테스트:**
-- `UserServiceFeignClientUnitTest`: WireMock 기반 FeignClient 단위 테스트
-- `UserServiceFeignClientConsumerContractTest`: Stub Runner 기반 Consumer Contract Test
-
-```kotlin
-@AutoConfigureStubRunner(
-    ids = ["com.groom:customer-service-contract-stubs:+:stubs:8090"],
-    stubsMode = StubRunnerProperties.StubsMode.LOCAL
-)
-```
-
-### 의존성
-```kotlin
-// Provider (HTTP API): Spring Cloud Contract
-id("org.springframework.cloud.contract") version "4.1.4"
-testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier")
-testImplementation("io.rest-assured:rest-assured")
-testImplementation("io.rest-assured:spring-mock-mvc")
-
-// Provider (Kafka 이벤트): Avro 스키마
-implementation("com.github.GroomC4:c4ang-contract-hub:1.0.0")
-implementation("io.confluent:kafka-avro-serializer:7.5.1")
-
-// Consumer (HTTP API): Spring Cloud Contract Stub Runner
-testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
-```
-
-### Contract 철학
-
-**핵심 원칙:** "각 서비스에서 Contract Test를 수행" (c4ang-contract-hub 참조)
-
-- ✅ **HTTP API Contract**: 각 서비스가 자신이 제공하는 API의 Contract를 정의하고 검증
-- ✅ **Event Schema**: c4ang-contract-hub에서 Avro 스키마로 중앙 관리
-- ✅ **서비스 자율성**: 서비스 코드와 Contract가 같은 저장소에 있어 버전 일치 보장
+- [c4ang-customer-service](https://github.com/GroomC4/c4ang-customer-service) - 고객 서비스
+- [c4ang-platform-core](https://github.com/GroomC4/c4ang-platform-core) - 공통 플랫폼 라이브러리
