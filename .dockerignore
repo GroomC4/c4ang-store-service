@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+.gitmodules
+
+# IDE
+.idea
+*.iml
+.vscode
+
+# Gradle build outputs
+build/
+*/build/
+.gradle/
+*/.gradle/
+
+# Logs
+logs/
+*.log
+
+# Test outputs
+**/test-results/
+**/reports/
+
+# Local configuration
+*.local
+.env
+.env.*
+
+# Documentation
+*.md
+!README.md
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Kubernetes manifests (if any)
+k8s/
+helm/
+
+# Misc
+.DS_Store
+Thumbs.db

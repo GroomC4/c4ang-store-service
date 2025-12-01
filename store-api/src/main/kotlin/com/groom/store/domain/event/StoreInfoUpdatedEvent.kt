@@ -1,6 +1,5 @@
 package com.groom.store.domain.event
 
-import com.groom.store.events.base.DomainEvent
 import com.groom.store.common.enums.StoreStatus
 import java.time.LocalDateTime
 import java.util.UUID

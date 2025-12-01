@@ -15,9 +15,6 @@ val platformCoreVersion = "2.2.0"
 val springCloudContractVersion = "4.1.4"
 
 dependencies {
-    // Internal modules
-    implementation(project(":store-events"))
-
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

@@ -1,6 +1,4 @@
-package com.groom.store.events.publisher
-
-import com.groom.store.events.base.DomainEvent
+package com.groom.store.domain.event
 
 /**
  * 도메인 이벤트를 발행하는 인터페이스.

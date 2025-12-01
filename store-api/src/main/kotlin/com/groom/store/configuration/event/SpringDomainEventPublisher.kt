@@ -1,7 +1,7 @@
 package com.groom.store.configuration.event
 
-import com.groom.store.events.base.DomainEvent
-import com.groom.store.events.publisher.DomainEventPublisher
+import com.groom.store.domain.event.DomainEvent
+import com.groom.store.domain.event.DomainEventPublisher
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
