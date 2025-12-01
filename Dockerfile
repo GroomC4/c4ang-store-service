@@ -3,13 +3,9 @@
 # ========================
 FROM gradle:8.5-jdk21 AS build
 
-# GitHub Packages 인증을 위한 ARG (CI/CD에서 자동 전달)
+# GitHub Packages 인증을 위한 ARG
 ARG GITHUB_ACTOR
 ARG GITHUB_TOKEN
-
-# 환경 변수로 설정 (Gradle이 사용)
-ENV GITHUB_ACTOR=${GITHUB_ACTOR}
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 
 WORKDIR /app
 
@@ -20,6 +16,12 @@ COPY gradlew ./
 
 # 서브모듈 build.gradle.kts 복사
 COPY store-api/build.gradle.kts store-api/
+COPY store-events/build.gradle.kts store-events/
+
+# gradle.properties 생성 (GitHub Packages 인증용)
+RUN mkdir -p ~/.gradle && \
+    echo "gpr.user=${GITHUB_ACTOR}" >> ~/.gradle/gradle.properties && \
+    echo "gpr.key=${GITHUB_TOKEN}" >> ~/.gradle/gradle.properties
 
 # 의존성 다운로드 (캐싱 활용)
 RUN ./gradlew dependencies --no-daemon || true
