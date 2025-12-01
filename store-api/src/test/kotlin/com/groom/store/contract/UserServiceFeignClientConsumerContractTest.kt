@@ -1,7 +1,8 @@
-package com.groom.store.adapter.out.client
+package com.groom.store.contract
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.groom.store.adapter.out.client.UserServiceFeignClient
 import feign.Feign
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
@@ -58,7 +59,6 @@ import java.util.UUID
     stubsMode = StubRunnerProperties.StubsMode.REMOTE,
     repositoryRoot = "https://maven.pkg.github.com/GroomC4/c4ang-customer-service",
 )
-@ActiveProfiles("test")
 @DisplayName("UserServiceFeignClient Consumer Contract 테스트")
 class UserServiceFeignClientConsumerContractTest {
     @Autowired
