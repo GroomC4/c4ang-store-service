@@ -27,8 +27,8 @@ RUN ./gradlew dependencies --no-daemon || true
 # 전체 소스 코드 복사
 COPY . .
 
-# Gradle 빌드 (테스트 제외)
-RUN ./gradlew clean build -x test --no-daemon
+# Gradle 빌드 (테스트 제외 - Docker 환경에서는 Testcontainers 사용 불가)
+RUN ./gradlew clean build -x test -x contractTest -x integrationTest --no-daemon
 
 # ========================
 # Runtime Stage
