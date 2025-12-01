@@ -20,7 +20,7 @@ spring:
       acks: all
       retries: 3
       batch-size: 16KB
-      buffer-size: 32MB
+      buffer-memory: 32MB
       compression-type: snappy
 
 # ====================================
