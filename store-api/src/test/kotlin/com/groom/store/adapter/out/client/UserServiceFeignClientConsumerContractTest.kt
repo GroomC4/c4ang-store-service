@@ -10,6 +10,8 @@ import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cloud.contract.stubrunner.StubFinder
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties
 import org.springframework.cloud.openfeign.support.SpringMvcContract
@@ -28,9 +30,10 @@ import java.util.UUID
  * - customer-service의 실제 API 변경 사항을 조기에 감지
  *
  * 동작 방식:
- * 1. customer-service의 Contract Stub JAR를 로컬 Maven에서 로드
- * 2. Stub Runner가 WireMock 서버를 8090 포트에서 실행
- * 3. Contract에 정의된 요청/응답 시나리오 검증
+ * 1. customer-service의 Contract Stub JAR를 GitHub Packages에서 로드
+ * 2. Stub Runner가 WireMock 서버를 동적 포트에서 실행
+ * 3. StubFinder를 통해 할당된 포트 조회
+ * 4. Contract에 정의된 요청/응답 시나리오 검증
  *
  * 차이점:
  * - Unit Test: FeignClient 자체 동작 검증 (빠름, 독립적)
@@ -51,18 +54,24 @@ import java.util.UUID
  */
 @SpringJUnitConfig
 @AutoConfigureStubRunner(
-    ids = ["com.groom:customer-service-contract-stubs:1.0.11:stubs:8090"],
+    ids = ["com.groom:customer-service-contract-stubs:+:stubs"],
     stubsMode = StubRunnerProperties.StubsMode.REMOTE,
     repositoryRoot = "https://maven.pkg.github.com/GroomC4/c4ang-customer-service",
 )
 @ActiveProfiles("test")
 @DisplayName("UserServiceFeignClient Consumer Contract 테스트")
 class UserServiceFeignClientConsumerContractTest {
+    @Autowired
+    private lateinit var stubFinder: StubFinder
+
     private lateinit var userServiceFeignClient: UserServiceFeignClient
 
     @BeforeEach
     fun setup() {
         val objectMapper = ObjectMapper().registerKotlinModule()
+
+        // StubFinder를 통해 동적으로 할당된 포트 조회
+        val stubUrl = stubFinder.findStubUrl("customer-service-contract-stubs")
 
         // Feign Client를 Stub Runner가 실행한 WireMock 서버에 연결
         userServiceFeignClient =
@@ -73,7 +82,7 @@ class UserServiceFeignClientConsumerContractTest {
                 .decoder(JacksonDecoder(objectMapper))
                 .requestInterceptor { template ->
                     template.header("Content-Type", "application/json")
-                }.target(UserServiceFeignClient::class.java, "http://localhost:8090")
+                }.target(UserServiceFeignClient::class.java, stubUrl.toString())
     }
 
     @Test
