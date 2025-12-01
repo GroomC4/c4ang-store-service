@@ -34,5 +34,9 @@ response:
         type: by_type
       - path: $.status
         type: by_type
+      - path: $.launchedAt
+        type: by_type
       - path: $.createdAt
+        type: by_type
+      - path: $.updatedAt
         type: by_type

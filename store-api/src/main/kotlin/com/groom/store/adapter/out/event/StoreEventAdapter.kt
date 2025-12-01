@@ -1,7 +1,7 @@
 package com.groom.store.adapter.out.event
 
-import com.groom.ecommerce.store.event.avro.StoreInfoUpdated
-import com.groom.store.configuration.kafka.KafkaProperties
+import com.groom.store.adapter.out.event.dto.StoreInfoUpdatedEventDto
+import com.groom.store.configuration.kafka.KafkaTopicProperties
 import com.groom.store.domain.event.StoreCreatedEvent
 import com.groom.store.domain.event.StoreDeletedEvent
 import com.groom.store.domain.event.StoreInfoUpdatedEvent
@@ -20,17 +20,17 @@ private val logger = KotlinLogging.logger {}
 @Component
 class StoreEventAdapter(
     private val kafkaTemplate: KafkaTemplate<String, Any>,
-    private val kafkaProperties: KafkaProperties,
+    private val kafkaTopicProperties: KafkaTopicProperties,
 ) : PublishEventPort {
     override fun publishStoreCreated(event: StoreCreatedEvent) {
         logger.info { "Publishing store.created event: storeId=${event.storeId}" }
 
-        // TODO: StoreCreated Avro 스키마 추가 후 구현
+        // TODO: StoreCreated 이벤트 구현
         // 현재는 로깅만 수행
     }
 
     override fun publishStoreInfoUpdated(event: StoreInfoUpdatedEvent) {
-        val topic = kafkaProperties.topics.storeInfoUpdated
+        val topic = kafkaTopicProperties.storeInfoUpdated
         val partitionKey = event.storeId.toString()
 
         // 변경된 필드 목록 생성
@@ -39,30 +39,29 @@ class StoreEventAdapter(
         if (event.isDescriptionChanged()) updatedFields.add("storeDescription")
         if (event.isStatusChanged()) updatedFields.add("storeStatus")
 
-        // Domain Event → Avro Event 변환
-        val avroEvent =
-            StoreInfoUpdated
-                .newBuilder()
-                .setEventId(UUID.randomUUID().toString())
-                .setEventTimestamp(System.currentTimeMillis())
-                .setStoreId(event.storeId.toString())
-                .setStoreName(event.after.name)
-                .setStoreStatus(event.after.status.name)
-                .setStoreDescription(event.after.description)
-                .setStorePhone(null)
-                .setStoreAddress(null)
-                .setBusinessHours(null)
-                .setStoreImageUrl(null)
-                .setUpdatedFields(updatedFields)
-                .setUpdatedAt(System.currentTimeMillis())
-                .build()
+        // Domain Event → Kafka Event DTO 변환
+        val kafkaEvent =
+            StoreInfoUpdatedEventDto(
+                eventId = UUID.randomUUID().toString(),
+                eventTimestamp = System.currentTimeMillis(),
+                storeId = event.storeId.toString(),
+                storeName = event.after.name,
+                storeStatus = event.after.status.name,
+                storeDescription = event.after.description,
+                storePhone = null,
+                storeAddress = null,
+                businessHours = null,
+                storeImageUrl = null,
+                updatedFields = updatedFields,
+                updatedAt = System.currentTimeMillis(),
+            )
 
         logger.info {
-            "Publishing store.info.updated event: eventId=${avroEvent.eventId}, " +
+            "Publishing store.info.updated event: eventId=${kafkaEvent.eventId}, " +
                 "storeId=${event.storeId}, updatedFields=$updatedFields"
         }
 
-        kafkaTemplate.send(topic, partitionKey, avroEvent).apply {
+        kafkaTemplate.send(topic, partitionKey, kafkaEvent).apply {
             whenComplete { result, ex ->
                 if (ex == null) {
                     logger.info {
@@ -74,7 +73,7 @@ class StoreEventAdapter(
                 } else {
                     logger.error(ex) {
                         "Failed to publish store.info.updated event: " +
-                            "eventId=${avroEvent.eventId}, storeId=${event.storeId}"
+                            "eventId=${kafkaEvent.eventId}, storeId=${event.storeId}"
                     }
                 }
             }
@@ -84,7 +83,7 @@ class StoreEventAdapter(
     override fun publishStoreDeleted(event: StoreDeletedEvent) {
         logger.info { "Publishing store.deleted event: storeId=${event.storeId}" }
 
-        // TODO: StoreDeleted Avro 스키마 추가 후 구현
+        // TODO: StoreDeleted 이벤트 구현
         // 현재는 로깅만 수행
     }
 }

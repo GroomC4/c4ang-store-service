@@ -1,20 +1,21 @@
 package com.groom.store.configuration.kafka
 
-import io.confluent.kafka.serializers.KafkaAvroSerializer
-import io.confluent.kafka.serializers.KafkaAvroSerializerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
+import org.springframework.kafka.support.serializer.JsonSerializer
 
 /**
  * Kafka Producer 설정
  *
- * Avro 직렬화를 사용하여 타입 안전한 이벤트 발행
+ * Spring Boot의 KafkaProperties를 사용하여 Testcontainers 동적 포트 연동 지원
+ * JSON 직렬화를 사용하여 이벤트 발행
  */
 @Configuration
 class KafkaProducerConfig(
@@ -26,17 +27,14 @@ class KafkaProducerConfig(
             mutableMapOf<String, Any>(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaProperties.bootstrapServers,
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
-                ProducerConfig.ACKS_CONFIG to kafkaProperties.producer.acks,
-                ProducerConfig.RETRIES_CONFIG to kafkaProperties.producer.retries,
-                ProducerConfig.BATCH_SIZE_CONFIG to kafkaProperties.producer.batchSize,
-                ProducerConfig.LINGER_MS_CONFIG to kafkaProperties.producer.lingerMs,
-                ProducerConfig.BUFFER_MEMORY_CONFIG to kafkaProperties.producer.bufferMemory,
-                ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to kafkaProperties.producer.maxInFlightRequestsPerConnection,
-                ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to kafkaProperties.producer.enableIdempotence,
-                ProducerConfig.COMPRESSION_TYPE_CONFIG to kafkaProperties.producer.compressionType,
-                KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG to kafkaProperties.schemaRegistry.url,
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to JsonSerializer::class.java,
             )
+
+        // Spring Boot KafkaProperties에서 설정된 producer 옵션 추가
+        configProps.putAll(kafkaProperties.buildProducerProperties(null))
+
+        // JSON Serializer 강제 적용 (buildProducerProperties가 덮어쓸 수 있으므로)
+        configProps[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = JsonSerializer::class.java
 
         return DefaultKafkaProducerFactory(configProps)
     }
@@ -46,35 +44,11 @@ class KafkaProducerConfig(
 }
 
 /**
- * Kafka 설정 Properties
+ * Kafka Topic 설정 Properties
  */
 @Configuration
-@ConfigurationProperties(prefix = "kafka")
-data class KafkaProperties(
-    var bootstrapServers: String = "localhost:9092",
-    val producer: ProducerProperties = ProducerProperties(),
-    val schemaRegistry: SchemaRegistryProperties = SchemaRegistryProperties(),
-    val topics: TopicProperties = TopicProperties(),
-)
-
-data class ProducerProperties(
-    var acks: String = "all",
-    var retries: Int = 3,
-    var batchSize: Int = 16384,
-    var lingerMs: Int = 10,
-    var bufferMemory: Long = 33554432L,
-    var maxInFlightRequestsPerConnection: Int = 5,
-    var enableIdempotence: Boolean = true,
-    var compressionType: String = "snappy",
-    var keySerializer: String = "org.apache.kafka.common.serialization.StringSerializer",
-    var valueSerializer: String = "io.confluent.kafka.serializers.KafkaAvroSerializer",
-)
-
-data class SchemaRegistryProperties(
-    var url: String = "http://localhost:8081",
-)
-
-data class TopicProperties(
+@ConfigurationProperties(prefix = "kafka.topics")
+data class KafkaTopicProperties(
     var storeInfoUpdated: String = "store.info.updated",
     var storeDeleted: String = "store.deleted",
 )

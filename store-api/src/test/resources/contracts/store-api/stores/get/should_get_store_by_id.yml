@@ -36,6 +36,8 @@ response:
         type: by_type
       - path: $.reviewCount
         type: by_type
+      - path: $.launchedAt
+        type: by_type
       - path: $.createdAt
         type: by_type
       - path: $.updatedAt
