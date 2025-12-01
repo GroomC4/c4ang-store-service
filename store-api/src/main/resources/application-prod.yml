@@ -5,7 +5,7 @@
 spring:
   datasource:
     master:
-      url: ${DB_MASTER_URL}
+      url: ${DB_MASTER_URL:jdbc:postgresql://store-db:5432/store_db}
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       driver-class-name: org.postgresql.Driver
@@ -16,7 +16,7 @@ spring:
         idle-timeout: 600000
         max-lifetime: 1800000
     replica:
-      url: ${DB_REPLICA_URL}
+      url: ${DB_REPLICA_URL:jdbc:postgresql://store-db:5432/store_db}
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       driver-class-name: org.postgresql.Driver
@@ -38,7 +38,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
 
 # ====================================
 # prod 환경 로그 레벨 (최소한의 로그)
@@ -58,9 +58,9 @@ logging:
   file:
     path: ${LOG_PATH:/var/log/store-service}
 
-# Redis 설정
+# Redis 설정 (ExternalName 서비스 사용)
 spring.data.redis:
-  host: ${REDIS_HOST}
+  host: ${REDIS_HOST:cache-redis}
   port: ${REDIS_PORT:6379}
   password: ${REDIS_PASSWORD:}
 

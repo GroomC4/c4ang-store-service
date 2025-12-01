@@ -5,12 +5,12 @@
 spring:
   datasource:
     master:
-      url: ${DB_MASTER_URL:jdbc:postgresql://postgres-primary:5432/groom}
+      url: ${DB_MASTER_URL:jdbc:postgresql://store-db:5435/store_db}
       username: ${DB_USERNAME:application}
       password: ${DB_PASSWORD:application}
       driver-class-name: org.postgresql.Driver
     replica:
-      url: ${DB_REPLICA_URL:jdbc:postgresql://postgres-replica:5432/groom}
+      url: ${DB_REPLICA_URL:jdbc:postgresql://store-db:5435/store_db}
       username: ${DB_USERNAME:application}
       password: ${DB_PASSWORD:application}
       driver-class-name: org.postgresql.Driver
@@ -53,9 +53,9 @@ logging:
   file:
     path: ./logs
 
-# Redis 설정
+# Redis 설정 (ExternalName 서비스 사용)
 spring.data.redis:
-  host: ${REDIS_HOST:redis}
+  host: ${REDIS_HOST:cache-redis}
   port: ${REDIS_PORT:6379}
 
 # Security 설정
