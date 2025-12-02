@@ -26,6 +26,11 @@ spring:
         connection-timeout: 30000
         idle-timeout: 600000
         max-lifetime: 1800000
+  data:
+    redis:
+      host: ${REDIS_HOST:cache-redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
   jpa:
     hibernate:
       ddl-auto: none
@@ -56,12 +61,6 @@ logging:
 
   file:
     path: ${LOG_PATH:/var/log/store-service}
-
-# Redis 설정 (ExternalName 서비스 사용)
-spring.data.redis:
-  host: ${REDIS_HOST:cache-redis}
-  port: ${REDIS_PORT:6379}
-  password: ${REDIS_PASSWORD:}
 
 # Feign Client 설정
 feign:

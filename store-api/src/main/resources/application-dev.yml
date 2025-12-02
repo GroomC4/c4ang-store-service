@@ -1,6 +1,8 @@
 # ====================================
-# dev 프로필 - k3d 개발환경 (Kubernetes)
+# dev 환경 설정 (k3d 개발 환경)
 # ====================================
+# k3d 클러스터 내 PostgreSQL, Redis 등 인프라 사용
+# 환경변수로 실제 연결 정보 주입
 
 spring:
   datasource:
@@ -16,6 +18,15 @@ spring:
       driver-class-name: org.postgresql.Driver
       hikari:
         maximum-pool-size: 5
+  data:
+    redis:
+      host: ${REDIS_HOST:cache-redis}
+      port: ${REDIS_PORT:6379}
+
+# Platform Core DataSource 라우팅 설정
+platform:
+  datasource:
+    replica-enabled: true
   jpa:
     hibernate:
       ddl-auto: none
@@ -26,36 +37,30 @@ spring:
       hibernate:
         format_sql: true  # SQL 포맷팅 활성화 (개발 환경)
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    show-sql: false  # logback으로 제어
 
 # ====================================
 # dev 환경 로그 레벨 (k3d 개발 환경)
 # ====================================
 logging:
   level:
+    # ROOT 레벨 - INFO
     root: INFO
 
-    # 프로젝트 패키지 - DEBUG 레벨 (상세 개발 로그)
+    # 프로젝트 패키지 - DEBUG 레벨 (개발 디버깅용)
     com.groom.store: DEBUG
 
-    # Spring Framework
+    # Spring Framework - INFO
     org.springframework: INFO
-    org.springframework.web: DEBUG
+    org.springframework.web: DEBUG  # HTTP 요청/응답 디버깅
 
     # Hibernate/JPA - SQL 쿼리 디버깅
     org.hibernate: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.SQL: DEBUG  # SQL 쿼리 출력
+    org.hibernate.orm.jdbc.bind: DEBUG  # SQL 파라미터 바인딩
 
   file:
     path: ./logs
-
-# Redis 설정 (ExternalName 서비스 사용)
-spring.data.redis:
-  host: ${REDIS_HOST:cache-redis}
-  port: ${REDIS_PORT:6379}
 
 # Feign Client 설정 (k3d 서비스 이름 사용)
 feign:
