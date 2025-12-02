@@ -1,8 +1,8 @@
-description: Store API - 유효한 스토어 ID로 조회
-name: should_get_store_by_id
+description: Store Internal API - 소유자 ID로 스토어 조회
+name: should_get_store_by_owner_id
 request:
   method: GET
-  url: /api/v1/stores/750e8400-e29b-41d4-a716-446655440101
+  url: /internal/v1/stores/owner/750e8400-e29b-41d4-a716-446655440001
   headers:
     Content-Type: application/json
 response:
@@ -31,11 +31,8 @@ response:
       - path: $.name
         type: by_type
       - path: $.status
-        type: by_equality
-      - path: $.averageRating
-        type: by_type
-      - path: $.reviewCount
-        type: by_type
+        type: by_regex
+        value: "REGISTERED|SUSPENDED|HIDDEN|DELETED"
       - path: $.launchedAt
         type: by_type
       - path: $.createdAt

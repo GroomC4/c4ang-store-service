@@ -1,24 +1,22 @@
-description: Store API - 인증된 Owner가 자신의 스토어 조회
-name: should_get_my_store
+description: Store Internal API - 스토어 ID로 조회
+name: should_get_store_by_id
 request:
   method: GET
-  url: /api/v1/stores/mine
+  url: /internal/v1/stores/750e8400-e29b-41d4-a716-446655440101
   headers:
     Content-Type: application/json
-    X-User-Id: "750e8400-e29b-41d4-a716-446655440002"
-    X-User-Role: "OWNER"
 response:
   status: 200
   headers:
     Content-Type: application/json
   body:
-    storeId: "750e8400-e29b-41d4-a716-446655440102"
-    ownerUserId: "750e8400-e29b-41d4-a716-446655440002"
-    name: "My Contract Store"
-    description: "Owner test store"
+    storeId: "750e8400-e29b-41d4-a716-446655440101"
+    ownerUserId: "750e8400-e29b-41d4-a716-446655440001"
+    name: "Contract Test Store"
+    description: "A test store for contract verification"
     status: "REGISTERED"
-    averageRating: 3.8
-    reviewCount: 15
+    averageRating: 4.5
+    reviewCount: 20
     launchedAt: "2024-01-01T00:00:00"
     createdAt: "2024-01-01T00:00:00"
     updatedAt: "2024-01-01T00:00:00"
@@ -28,12 +26,13 @@ response:
         type: by_regex
         value: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
       - path: $.ownerUserId
-        type: by_equality
-        value: "750e8400-e29b-41d4-a716-446655440002"
+        type: by_regex
+        value: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
       - path: $.name
         type: by_type
       - path: $.status
-        type: by_type
+        type: by_regex
+        value: "REGISTERED|SUSPENDED|HIDDEN|DELETED"
       - path: $.launchedAt
         type: by_type
       - path: $.createdAt

@@ -49,7 +49,6 @@ logging:
     com.groom.store: INFO
     org.springframework: WARN
     org.springframework.web: WARN
-    org.springframework.security: WARN
     org.hibernate: WARN
     org.hibernate.SQL: OFF
     org.hibernate.orm.jdbc.bind: OFF
@@ -63,14 +62,6 @@ spring.data.redis:
   host: ${REDIS_HOST:cache-redis}
   port: ${REDIS_PORT:6379}
   password: ${REDIS_PASSWORD:}
-
-# Security 설정
-security:
-  jwt:
-    secret: ${JWT_SECRET}
-    issuer: ${JWT_ISSUER:ecommerce-service-api}
-    accessTokenExpirationMinutes: ${JWT_ACCESS_TOKEN_EXPIRATION:5}
-    refreshTokenExpirationDays: ${JWT_REFRESH_TOKEN_EXPIRATION:3}
 
 # Feign Client 설정
 feign:
