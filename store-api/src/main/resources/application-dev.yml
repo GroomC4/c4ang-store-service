@@ -43,7 +43,6 @@ logging:
     # Spring Framework
     org.springframework: INFO
     org.springframework.web: DEBUG
-    org.springframework.security: DEBUG
 
     # Hibernate/JPA - SQL 쿼리 디버깅
     org.hibernate: INFO
@@ -57,14 +56,6 @@ logging:
 spring.data.redis:
   host: ${REDIS_HOST:cache-redis}
   port: ${REDIS_PORT:6379}
-
-# Security 설정
-security:
-  jwt:
-    secret: ${JWT_SECRET:dev-environment-secret-please-change}
-    issuer: ecommerce-service-api
-    accessTokenExpirationMinutes: 60
-    refreshTokenExpirationDays: 7
 
 # Feign Client 설정 (k3d 서비스 이름 사용)
 feign:

@@ -215,7 +215,13 @@ tasks.test {
 contracts {
     testMode.set(org.springframework.cloud.contract.verifier.config.TestMode.MOCKMVC)
     baseClassForTests.set("com.groom.store.common.ContractTestBase")
-    contractsDslDir.set(file("src/test/resources/contracts"))
+    // Service API와 Internal API 모두 포함
+    contractsDslDir.set(file("src/test/resources"))
+    // contracts.service-api와 contracts.internal 디렉토리 모두 사용
+    baseClassMappings.apply {
+        baseClassMapping(".*contracts\\.service-api.*", "com.groom.store.common.ContractTestBase")
+        baseClassMapping(".*contracts\\.internal.*", "com.groom.store.common.InternalContractTestBase")
+    }
 }
 
 // Contract Stub 발행 설정 (Consumer가 사용할 수 있도록 GitHub Packages에 발행)

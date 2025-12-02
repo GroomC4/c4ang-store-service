@@ -37,7 +37,6 @@ logging:
     # Spring Framework - INFO
     org.springframework: INFO
     org.springframework.web: INFO
-    org.springframework.security: INFO
 
     # Hibernate/JPA - WARN (기본값)
     org.hibernate: WARN
@@ -45,17 +44,6 @@ logging:
 
   file:
     path: ./logs  # 로그 파일 저장 경로
-
-encryption:
-  encoder:
-    bcrypt-strength: 10
-
-security:
-  jwt:
-    secret: local-development-secret-please-change
-    issuer: ecommerce-service-api
-    accessTokenExpirationMinutes: 5
-    refreshTokenExpirationDays: 3
 
 springdoc:
   api-docs:
