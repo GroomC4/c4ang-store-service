@@ -13,8 +13,11 @@ response:
     code: "STORE_NOT_FOUND"
     message: "Store not found"
   matchers:
+    headers:
+      - key: Content-Type
+        regex: "application/(json|problem\\+json).*"
     body:
       - path: $.code
-        type: by_type
+        type: by_equality
       - path: $.message
         type: by_type

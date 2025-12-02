@@ -13,11 +13,11 @@ response:
     storeId: "750e8400-e29b-41d4-a716-446655440101"
     ownerUserId: "750e8400-e29b-41d4-a716-446655440001"
     name: "Contract Test Store"
-    description: "A store for contract testing"
+    description: "A test store for contract verification"
     status: "REGISTERED"
     averageRating: 4.5
-    reviewCount: 10
-    launchedAt: "2024-01-15T10:00:00"
+    reviewCount: 20
+    launchedAt: "2024-01-01T00:00:00"
     createdAt: "2024-01-01T00:00:00"
     updatedAt: "2024-01-01T00:00:00"
   matchers:

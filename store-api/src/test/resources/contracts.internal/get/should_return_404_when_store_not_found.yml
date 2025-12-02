@@ -11,10 +11,13 @@ response:
     Content-Type: application/json
   body:
     code: "STORE_NOT_FOUND"
-    message: "Store not found"
+    message: "스토어를 찾을 수 없습니다: 00000000-0000-0000-0000-000000000000"
   matchers:
+    headers:
+      - key: Content-Type
+        regex: "application/(json|problem\\+json).*"
     body:
       - path: $.code
-        type: by_type
+        type: by_equality
       - path: $.message
         type: by_type

@@ -219,8 +219,7 @@ contracts {
     contractsDslDir.set(file("src/test/resources"))
     // contracts.service-api와 contracts.internal 디렉토리 모두 사용
     baseClassMappings.apply {
-        baseClassMapping(".*contracts\\.service-api.*", "com.groom.store.common.ContractTestBase")
-        baseClassMapping(".*contracts\\.internal.*", "com.groom.store.common.InternalContractTestBase")
+        baseClassMapping(".*contracts\\.internal.*", "com.groom.store.common.ContractTestBase")
     }
 }
 
