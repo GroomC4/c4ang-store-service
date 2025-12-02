@@ -1,8 +1,9 @@
 package com.groom.store.adapter.inbound.web
 
-import com.groom.store.adapter.inbound.web.dto.GetStoreResponse
-import com.groom.store.application.dto.GetStoreQuery
-import com.groom.store.application.service.GetStoreService
+import com.groom.store.adapter.inbound.web.dto.GetStoreInternalResponse
+import com.groom.store.application.dto.GetStoreByIdQuery
+import com.groom.store.application.dto.GetStoreByOwnerIdQuery
+import com.groom.store.application.port.inbound.GetStoreInternalUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -23,7 +24,7 @@ import java.util.UUID
 @RestController
 @RequestMapping("/internal/v1/stores")
 class StoreInternalController(
-    private val getStoreService: GetStoreService,
+    private val getStoreInternalUseCase: GetStoreInternalUseCase,
 ) {
     /**
      * 스토어 ID로 스토어 정보를 조회한다.
@@ -41,10 +42,10 @@ class StoreInternalController(
     @GetMapping("/{storeId}")
     fun getStoreById(
         @PathVariable storeId: UUID,
-    ): GetStoreResponse {
-        val query = GetStoreQuery(storeId = storeId)
-        val result = getStoreService.getStore(query)
-        return GetStoreResponse.from(result)
+    ): GetStoreInternalResponse {
+        val query = GetStoreByIdQuery(storeId = storeId)
+        val result = getStoreInternalUseCase.getStoreById(query)
+        return GetStoreInternalResponse.from(result)
     }
 
     /**
@@ -63,8 +64,9 @@ class StoreInternalController(
     @GetMapping("/owner/{ownerUserId}")
     fun getStoreByOwnerId(
         @PathVariable ownerUserId: UUID,
-    ): GetStoreResponse {
-        val result = getStoreService.getMyStore(ownerUserId)
-        return GetStoreResponse.from(result)
+    ): GetStoreInternalResponse {
+        val query = GetStoreByOwnerIdQuery(ownerUserId = ownerUserId)
+        val result = getStoreInternalUseCase.getStoreByOwnerId(query)
+        return GetStoreInternalResponse.from(result)
     }
 }
