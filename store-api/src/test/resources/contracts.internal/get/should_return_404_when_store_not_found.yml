@@ -1,0 +1,20 @@
+description: Store Internal API - 존재하지 않는 스토어 조회 시 404
+name: should_return_404_when_store_not_found
+request:
+  method: GET
+  url: /internal/v1/stores/00000000-0000-0000-0000-000000000000
+  headers:
+    Content-Type: application/json
+response:
+  status: 404
+  headers:
+    Content-Type: application/json
+  body:
+    code: "STORE_NOT_FOUND"
+    message: "Store not found"
+  matchers:
+    body:
+      - path: $.code
+        type: by_type
+      - path: $.message
+        type: by_type
