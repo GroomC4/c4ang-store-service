@@ -33,6 +33,8 @@ response:
       - path: $.status
         type: by_regex
         value: "REGISTERED|SUSPENDED|HIDDEN|DELETED"
+      - path: $.launchedAt
+        type: by_type
       - path: $.createdAt
         type: by_type
       - path: $.updatedAt
