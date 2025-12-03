@@ -1,6 +1,6 @@
 description: |
   Consumer: order-service
-  Purpose: 주문 생성 시 스토어 정보(storeId, ownerUserId, name, status) 조회
+  Purpose: 주문 생성 시 스토어 정보(storeId, name, status) 조회
 name: order_service_get_store_by_id
 request:
   method: GET
@@ -13,18 +13,11 @@ response:
     Content-Type: application/json
   body:
     storeId: "660e8400-e29b-41d4-a716-446655440001"
-    ownerUserId: "123e4567-e89b-12d3-a456-426614174000"
     name: "Contract Test Store for Order"
     status: "REGISTERED"
-    reviewCount: 0
-    createdAt: "2024-01-01T10:30:00"
-    updatedAt: "2024-11-20T14:22:00"
   matchers:
     body:
       - path: $.storeId
-        type: by_regex
-        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
-      - path: $.ownerUserId
         type: by_regex
         value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
       - path: $.name
@@ -32,9 +25,3 @@ response:
       - path: $.status
         type: by_regex
         value: "REGISTERED|SUSPENDED|DELETED"
-      - path: $.reviewCount
-        type: by_type
-      - path: $.createdAt
-        type: by_type
-      - path: $.updatedAt
-        type: by_type
