@@ -26,6 +26,8 @@ class StorePersistenceAdapter(
 
     override fun existsByOwnerUserId(ownerUserId: UUID): Boolean = storeJpaRepository.existsByOwnerUserId(ownerUserId)
 
+    override fun existsById(storeId: UUID): Boolean = storeJpaRepository.existsById(storeId)
+
     override fun loadAllById(storeIds: Iterable<UUID>): List<Store> = storeJpaRepository.findAllById(storeIds)
 
     override fun save(store: Store): Store = storeJpaRepository.save(store)

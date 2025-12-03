@@ -50,6 +50,14 @@ interface LoadStorePort {
     fun existsByOwnerUserId(ownerUserId: UUID): Boolean
 
     /**
+     * 스토어 ID로 스토어가 존재하는지 확인한다.
+     *
+     * @param storeId 스토어 ID
+     * @return 스토어 존재 여부
+     */
+    fun existsById(storeId: UUID): Boolean
+
+    /**
      * 여러 스토어 ID로 스토어 목록을 조회한다 (Batch).
      *
      * @param storeIds 스토어 ID 목록
