@@ -119,6 +119,34 @@ val integrationTest by tasks.registering(Test::class) {
     shouldRunAfter(tasks.test)
 }
 
+// Consumer Contract Test 전용 태스크
+// 다른 서비스의 Contract Stub을 검증 (인프라 불필요, 빠른 실행)
+val consumerContractTest by tasks.registering(Test::class) {
+    description = "Runs consumer contract tests without infrastructure (fast)"
+    group = "verification"
+
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+
+    // consumer-contract-test 프로필 활성화
+    systemProperty("spring.profiles.active", "consumer-contract-test")
+
+    useJUnitPlatform {
+        // Consumer Contract Test 클래스만 포함
+        includeEngines("junit-jupiter")
+    }
+
+    // Consumer Contract Test 패키지만 포함
+    filter {
+        includeTestsMatching("*ConsumerContractTest")
+    }
+
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
 // Docker Compose 연동 태스크 추가
 val dockerComposeUp by tasks.registering(Exec::class) {
     group = "docker"
