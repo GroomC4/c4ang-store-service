@@ -1,0 +1,27 @@
+description: |
+  Consumer: order-service
+  Purpose: 주문 생성 시 스토어 정보(id, name, status) 조회
+name: order_service_get_store_by_id
+request:
+  method: GET
+  url: /internal/v1/stores/660e8400-e29b-41d4-a716-446655440001
+  headers:
+    Content-Type: application/json
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    id: "660e8400-e29b-41d4-a716-446655440001"
+    name: "Contract Test Store for Order"
+    status: "REGISTERED"
+  matchers:
+    body:
+      - path: $.id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.name
+        type: by_type
+      - path: $.status
+        type: by_regex
+        value: "REGISTERED|SUSPENDED|DELETED"
