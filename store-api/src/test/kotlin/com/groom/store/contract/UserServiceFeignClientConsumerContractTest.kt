@@ -54,6 +54,7 @@ import java.util.UUID
  * - 로컬에서는 build.gradle.kts의 repositories 설정 참조
  */
 @SpringJUnitConfig
+@ActiveProfiles("consumer-contract-test")
 @AutoConfigureStubRunner(
     ids = ["com.groom:customer-service-contract-stubs:+:stubs"],
     stubsMode = StubRunnerProperties.StubsMode.REMOTE,

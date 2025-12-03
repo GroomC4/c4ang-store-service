@@ -1,0 +1,40 @@
+description: |
+  Consumer: product-service
+  Purpose: 상품 등록 시 스토어 소유자 검증 및 스토어 정보(storeId, ownerUserId, name) 조회
+name: product_service_get_store_by_id
+request:
+  method: GET
+  url: /internal/v1/stores/750e8400-e29b-41d4-a716-446655440101
+  headers:
+    Content-Type: application/json
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    storeId: "750e8400-e29b-41d4-a716-446655440101"
+    ownerUserId: "750e8400-e29b-41d4-a716-446655440001"
+    name: "Contract Test Store"
+    status: "REGISTERED"
+    reviewCount: 20
+    createdAt: "2024-01-01T00:00:00"
+    updatedAt: "2024-01-01T00:00:00"
+  matchers:
+    body:
+      - path: $.storeId
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.ownerUserId
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.name
+        type: by_type
+      - path: $.status
+        type: by_regex
+        value: "REGISTERED|SUSPENDED|DELETED"
+      - path: $.reviewCount
+        type: by_type
+      - path: $.createdAt
+        type: by_type
+      - path: $.updatedAt
+        type: by_type
