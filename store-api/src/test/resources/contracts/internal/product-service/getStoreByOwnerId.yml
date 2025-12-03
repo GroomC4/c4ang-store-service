@@ -1,10 +1,10 @@
 description: |
-  Consumer: order-service
-  Purpose: 주문 생성 시 스토어 정보(storeId, ownerUserId, name, status) 조회
-name: order_service_get_store_by_id
+  Consumer: product-service
+  Purpose: 소유자 ID로 스토어 정보 조회 (상품 서비스에서 스토어 소유자 확인용)
+name: product_service_get_store_by_owner_id
 request:
   method: GET
-  url: /internal/v1/stores/660e8400-e29b-41d4-a716-446655440001
+  url: /internal/v1/stores/owner/750e8400-e29b-41d4-a716-446655440001
   headers:
     Content-Type: application/json
 response:
@@ -12,11 +12,14 @@ response:
   headers:
     Content-Type: application/json
   body:
-    storeId: "660e8400-e29b-41d4-a716-446655440001"
-    ownerUserId: "123e4567-e89b-12d3-a456-426614174000"
-    name: "Contract Test Store for Order"
+    storeId: "750e8400-e29b-41d4-a716-446655440101"
+    ownerUserId: "750e8400-e29b-41d4-a716-446655440001"
+    name: "Contract Test Store for Product"
+    description: "A test store for product service contract testing"
     status: "REGISTERED"
-    reviewCount: 0
+    averageRating: 4.5
+    reviewCount: 10
+    launchedAt: "2024-01-15T09:00:00"
     createdAt: "2024-01-01T10:30:00"
     updatedAt: "2024-11-20T14:22:00"
   matchers:

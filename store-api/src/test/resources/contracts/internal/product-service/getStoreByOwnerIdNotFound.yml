@@ -1,10 +1,10 @@
 description: |
-  Consumer: order-service
-  Purpose: 존재하지 않는 스토어 조회 시 404 응답
-name: order_service_get_store_by_id_not_found
+  Consumer: product-service
+  Purpose: 스토어가 없는 소유자 조회 시 404 응답
+name: product_service_get_store_by_owner_id_not_found
 request:
   method: GET
-  url: /internal/v1/stores/999e8400-e29b-41d4-a716-446655440999
+  url: /internal/v1/stores/owner/00000000-0000-0000-0000-000000000000
   headers:
     Content-Type: application/json
 response:
@@ -12,10 +12,10 @@ response:
   headers:
     Content-Type: application/json
   body:
-    errorCode: "STORE_NOT_FOUND"
-    message: "스토어를 찾을 수 없습니다"
+    errorCode: "OWNER_STORE_NOT_FOUND"
+    message: "해당 소유자의 스토어를 찾을 수 없습니다"
     timestamp: 1699999999999
-    path: "/internal/v1/stores/999e8400-e29b-41d4-a716-446655440999"
+    path: "/internal/v1/stores/owner/00000000-0000-0000-0000-000000000000"
   matchers:
     headers:
       - key: Content-Type
