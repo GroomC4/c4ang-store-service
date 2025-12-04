@@ -1,10 +1,6 @@
 package com.groom.store.common.exception.handler
 
-import com.groom.store.common.exception.AuthenticationException
 import com.groom.store.common.exception.ErrorCode
-import com.groom.store.common.exception.PermissionException
-import com.groom.store.common.exception.RefreshTokenException
-import com.groom.store.common.exception.ResourceException
 import com.groom.store.common.exception.StoreException
 import com.groom.store.common.exception.UserException
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -39,84 +35,11 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         )
 
     /**
-     * 인증 관련 예외 처리
-     *
-     * 발생 위치:
-     * - CustomerAuthenticationService.login(): UserNotFoundByEmail, InvalidPassword
-     * - OwnerAuthenticationService.login(): UserNotFoundByEmail, InvalidPassword
-     *
-     * 참고: TokenException은 필터 레이어에서만 발생하므로 CustomAuthenticationEntryPoint에서 처리
-     */
-    @ExceptionHandler(AuthenticationException::class)
-    fun handleAuthenticationException(e: AuthenticationException): ResponseEntity<ErrorResponse> {
-        val errorCode =
-            when (e) {
-                is AuthenticationException.UserNotFoundByEmail -> {
-                    logger.warn(e) { "User not found by email: ${e.email}" }
-                    ErrorCode.USER_NOT_FOUND_BY_EMAIL
-                }
-                is AuthenticationException.InvalidPassword -> {
-                    logger.warn(e) { "Invalid password for email: ${e.email}" }
-                    ErrorCode.INVALID_PASSWORD
-                }
-                is AuthenticationException.InvalidCredentials -> {
-                    logger.warn(e) { "Invalid credentials: clue=${e.clue}" }
-                    ErrorCode.INVALID_CREDENTIALS
-                }
-            }
-
-        return ResponseEntity(
-            ErrorResponse(
-                code = errorCode,
-                message = e.message ?: "인증에 실패하였습니다.",
-            ),
-            HttpStatus.UNAUTHORIZED,
-        )
-    }
-
-    /**
-     * 리프레시 토큰 관련 예외 처리
-     *
-     * 발생 위치:
-     * - RefreshTokenService.refresh() → Authenticator.refreshCredentials()
-     *   - RefreshTokenNotFound: DB에 리프레시 토큰이 없는 경우
-     *   - RefreshTokenExpired: 리프레시 토큰 만료
-     */
-    @ExceptionHandler(RefreshTokenException::class)
-    fun handleRefreshTokenException(e: RefreshTokenException): ResponseEntity<ErrorResponse> {
-        val errorCode =
-            when (e) {
-                is RefreshTokenException.RefreshTokenNotFound -> {
-                    logger.warn(e) { "Refresh token not found" }
-                    ErrorCode.REFRESH_TOKEN_NOT_FOUND
-                }
-                is RefreshTokenException.RefreshTokenExpired -> {
-                    logger.warn(e) { "Refresh token expired" }
-                    ErrorCode.REFRESH_TOKEN_EXPIRED
-                }
-                is RefreshTokenException.RefreshTokenMismatch -> {
-                    logger.warn(e) { "Refresh token mismatch for userId: ${e.userId}" }
-                    ErrorCode.REFRESH_TOKEN_MISMATCH
-                }
-            }
-
-        return ResponseEntity(
-            ErrorResponse(
-                code = errorCode,
-                message = e.message ?: "리프레시 토큰 검증에 실패하였습니다.",
-            ),
-            HttpStatus.UNAUTHORIZED,
-        )
-    }
-
-    /**
      * 사용자 관련 예외 처리
      *
      * 발생 위치:
-     * - import com.groom.store.domain.model.UserPolicy.checkAlreadyRegister(): DuplicateEmail
-     * - CustomerAuthenticationService.logout(): UserNotFound
-     * - OwnerAuthenticationService.logout(): UserNotFound
-     * - StoreController.registerStore(): InsufficientPermission
+     * - SellerPolicy.checkUserIsSeller(): InsufficientPermission
+     * - LoadUserPort.loadUser(): UserNotFound
      */
     @ExceptionHandler(UserException::class)
     fun handleUserException(e: UserException): ResponseEntity<ErrorResponse> {
@@ -144,56 +67,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             ErrorResponse(
                 code = errorCode,
                 message = e.message ?: "사용자 처리 중 오류가 발생하였습니다.",
-            ),
-            httpStatus,
-        )
-    }
-
-    @ExceptionHandler(PermissionException::class)
-    fun handlePermissionException(e: PermissionException): ResponseEntity<ErrorResponse> {
-        val errorCode =
-            when (e) {
-                is PermissionException.AccessDenied -> {
-                    logger.warn(e) { "Access denied: userId=${e.userId}, resource=${e.resource}" }
-                    ErrorCode.ACCESS_DENIED
-                }
-                is PermissionException.InsufficientPermissions -> {
-                    logger.warn(e) { "Insufficient permissions: userId=${e.userId}, required=${e.required}" }
-                    ErrorCode.INSUFFICIENT_PERMISSIONS
-                }
-            }
-
-        return ResponseEntity(
-            ErrorResponse(
-                code = errorCode,
-                message = e.message ?: "권한이 부족합니다.",
-            ),
-            HttpStatus.FORBIDDEN,
-        )
-    }
-
-    @ExceptionHandler(ResourceException::class)
-    fun handleResourceException(e: ResourceException): ResponseEntity<ErrorResponse> {
-        val (errorCode, httpStatus) =
-            when (e) {
-                is ResourceException.ResourceNotFound -> {
-                    logger.warn(e) { "Resource not found: type=${e.resourceType}, id=${e.identifier}, clue=${e.clue}" }
-                    ErrorCode.RESOURCE_NOT_FOUND to HttpStatus.NOT_FOUND
-                }
-                is ResourceException.ResourceAlreadyExists -> {
-                    logger.warn(e) { "Resource already exists: type=${e.resourceType}, id=${e.identifier}, clue=${e.clue}" }
-                    ErrorCode.RESOURCE_ALREADY_EXISTS to HttpStatus.CONFLICT
-                }
-                is ResourceException.ResourceConflict -> {
-                    logger.warn(e) { "Resource conflict: type=${e.resourceType}, reason=${e.reason}, clue=${e.clue}" }
-                    ErrorCode.RESOURCE_CONFLICT to HttpStatus.CONFLICT
-                }
-            }
-
-        return ResponseEntity(
-            ErrorResponse(
-                code = errorCode,
-                message = e.message ?: "리소스 처리 중 오류가 발생하였습니다.",
             ),
             httpStatus,
         )
