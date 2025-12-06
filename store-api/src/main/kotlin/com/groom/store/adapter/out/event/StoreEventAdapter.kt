@@ -1,5 +1,7 @@
 package com.groom.store.adapter.out.event
 
+import com.groom.store.adapter.out.event.dto.StoreCreatedEventDto
+import com.groom.store.adapter.out.event.dto.StoreDeletedEventDto
 import com.groom.store.adapter.out.event.dto.StoreInfoUpdatedEventDto
 import com.groom.store.configuration.kafka.KafkaTopicProperties
 import com.groom.store.domain.event.StoreCreatedEvent
@@ -23,10 +25,42 @@ class StoreEventAdapter(
     private val kafkaTopicProperties: KafkaTopicProperties,
 ) : PublishEventPort {
     override fun publishStoreCreated(event: StoreCreatedEvent) {
-        logger.info { "Publishing store.created event: storeId=${event.storeId}" }
+        val topic = kafkaTopicProperties.storeCreated
+        val partitionKey = event.storeId.toString()
 
-        // TODO: StoreCreated 이벤트 구현
-        // 현재는 로깅만 수행
+        val kafkaEvent =
+            StoreCreatedEventDto(
+                eventId = UUID.randomUUID().toString(),
+                eventTimestamp = System.currentTimeMillis(),
+                storeId = event.storeId.toString(),
+                ownerUserId = event.ownerUserId.toString(),
+                storeName = event.storeName,
+                storeDescription = event.description,
+                createdAt = System.currentTimeMillis(),
+            )
+
+        logger.info {
+            "Publishing store.created event: eventId=${kafkaEvent.eventId}, " +
+                "storeId=${event.storeId}, ownerUserId=${event.ownerUserId}"
+        }
+
+        kafkaTemplate.send(topic, partitionKey, kafkaEvent).apply {
+            whenComplete { result, ex ->
+                if (ex == null) {
+                    logger.info {
+                        "Successfully published store.created event: " +
+                            "topic=${result.recordMetadata.topic()}, " +
+                            "partition=${result.recordMetadata.partition()}, " +
+                            "offset=${result.recordMetadata.offset()}"
+                    }
+                } else {
+                    logger.error(ex) {
+                        "Failed to publish store.created event: " +
+                            "eventId=${kafkaEvent.eventId}, storeId=${event.storeId}"
+                    }
+                }
+            }
+        }
     }
 
     override fun publishStoreInfoUpdated(event: StoreInfoUpdatedEvent) {
@@ -81,9 +115,40 @@ class StoreEventAdapter(
     }
 
     override fun publishStoreDeleted(event: StoreDeletedEvent) {
-        logger.info { "Publishing store.deleted event: storeId=${event.storeId}" }
+        val topic = kafkaTopicProperties.storeDeleted
+        val partitionKey = event.storeId.toString()
 
-        // TODO: StoreDeleted 이벤트 구현
-        // 현재는 로깅만 수행
+        val kafkaEvent =
+            StoreDeletedEventDto(
+                eventId = UUID.randomUUID().toString(),
+                eventTimestamp = System.currentTimeMillis(),
+                storeId = event.storeId.toString(),
+                ownerUserId = event.ownerUserId.toString(),
+                storeName = event.storeName,
+                deletedAt = System.currentTimeMillis(),
+            )
+
+        logger.info {
+            "Publishing store.deleted event: eventId=${kafkaEvent.eventId}, " +
+                "storeId=${event.storeId}, ownerUserId=${event.ownerUserId}"
+        }
+
+        kafkaTemplate.send(topic, partitionKey, kafkaEvent).apply {
+            whenComplete { result, ex ->
+                if (ex == null) {
+                    logger.info {
+                        "Successfully published store.deleted event: " +
+                            "topic=${result.recordMetadata.topic()}, " +
+                            "partition=${result.recordMetadata.partition()}, " +
+                            "offset=${result.recordMetadata.offset()}"
+                    }
+                } else {
+                    logger.error(ex) {
+                        "Failed to publish store.deleted event: " +
+                            "eventId=${kafkaEvent.eventId}, storeId=${event.storeId}"
+                    }
+                }
+            }
+        }
     }
 }

@@ -49,6 +49,7 @@ class KafkaProducerConfig(
 @Configuration
 @ConfigurationProperties(prefix = "kafka.topics")
 data class KafkaTopicProperties(
+    var storeCreated: String = "store.created",
     var storeInfoUpdated: String = "store.info.updated",
     var storeDeleted: String = "store.deleted",
 )
