@@ -48,7 +48,7 @@ logging:
 feign:
   clients:
     user-service:
-      url: http://localhost:8081
+      url: http://localhost:8082
       connect-timeout: 10000
       read-timeout: 10000
       logger-level: full
