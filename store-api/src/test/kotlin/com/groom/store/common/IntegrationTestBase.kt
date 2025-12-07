@@ -53,13 +53,17 @@ import org.springframework.test.context.ContextConfiguration
         "testcontainers.kafka.auto-create-topics=true",
 
         // Kafka Topics
-        "testcontainers.kafka.topics[0].name=store.info.updated",
-        "testcontainers.kafka.topics[0].partitions=3",
+        "testcontainers.kafka.topics[0].name=store.created",
+        "testcontainers.kafka.topics[0].partitions=1",
         "testcontainers.kafka.topics[0].replication-factor=1",
 
-        "testcontainers.kafka.topics[1].name=store.deleted",
-        "testcontainers.kafka.topics[1].partitions=1",
+        "testcontainers.kafka.topics[1].name=store.info.updated",
+        "testcontainers.kafka.topics[1].partitions=3",
         "testcontainers.kafka.topics[1].replication-factor=1",
+
+        "testcontainers.kafka.topics[2].name=store.deleted",
+        "testcontainers.kafka.topics[2].partitions=1",
+        "testcontainers.kafka.topics[2].replication-factor=1",
     ],
 )
 @ContextConfiguration(initializers = [WireMockInitializer::class])

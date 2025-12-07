@@ -38,6 +38,7 @@ spring:
 # Kafka Topic 설정 (커스텀)
 kafka:
   topics:
+    store-created: store.created
     store-info-updated: store.info.updated
     store-deleted: store.deleted
 
