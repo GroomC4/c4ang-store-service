@@ -1,7 +1,9 @@
 package com.groom.store.common
 
 import com.groom.platform.testcontainers.annotation.IntegrationTest
+import com.groom.store.common.wiremock.WireMockInitializer
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ContextConfiguration
 
 /**
  * 통합 테스트 베이스 클래스 (RC13 패턴)
@@ -26,6 +28,11 @@ import org.springframework.boot.test.context.SpringBootTest
  * - @IntegrationTest 어노테이션 중앙화
  * - @ContextConfiguration 제거 (@IntegrationTest에 포함됨)
  * - Kafka/Schema Registry 동적 포트 주입 자동화
+ *
+ * **WireMock 통합:**
+ * - WireMockInitializer가 FeignClient 요청을 WireMock 서버로 라우팅
+ * - TestUserRegistry에 등록된 사용자 정보가 자동으로 stub됨
+ * - 커스텀 stub이 필요한 경우 WireMockUserServiceConfig 사용
  */
 @IntegrationTest
 @SpringBootTest(
@@ -55,4 +62,5 @@ import org.springframework.boot.test.context.SpringBootTest
         "testcontainers.kafka.topics[1].replication-factor=1",
     ],
 )
+@ContextConfiguration(initializers = [WireMockInitializer::class])
 abstract class IntegrationTestBase

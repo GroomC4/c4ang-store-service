@@ -1,6 +1,7 @@
 package com.groom.store.common.base
 
 import com.groom.store.common.IntegrationTestBase
+import com.groom.store.common.wiremock.WireMockUserServiceConfig
 import com.groom.store.domain.port.PublishEventPort
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.clearAllMocks
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach
  * Store Service의 Service 계층 통합테스트 Base Class
  *
  * Store Service에 필요한 PublishEventPort Mock을 제공합니다.
- * UserServiceClient는 MockUserServiceClient가 자동으로 주입됩니다.
+ * UserServiceFeignClient는 WireMock 서버를 통해 stub 응답을 받습니다.
  *
  * 사용 방법:
  * ```kotlin
@@ -19,9 +20,18 @@ import org.junit.jupiter.api.BeforeEach
  * class RegisterStoreServiceIntegrationTest : StoreBaseServiceIntegrationTest() {
  *     @Test
  *     fun test() {
- *         // MockUserServiceClient가 자동으로 TestUserRegistry의 사용자 정보를 반환합니다.
+ *         // WireMock이 TestUserRegistry의 사용자 정보를 stub 응답으로 반환합니다.
  *         // 테스트 로직
  *     }
+ * }
+ * ```
+ *
+ * 커스텀 사용자 응답이 필요한 경우:
+ * ```kotlin
+ * @Test
+ * fun `특정 사용자 테스트`() {
+ *     WireMockUserServiceConfig.stubUser(customUserId, "Custom User", "OWNER")
+ *     // 테스트 로직
  * }
  * ```
  */

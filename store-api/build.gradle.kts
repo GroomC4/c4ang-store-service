@@ -69,6 +69,9 @@ dependencies {
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
     // Feign Jackson for contract tests
     testImplementation("io.github.openfeign:feign-jackson:13.1")
+
+    // WireMock for integration testing
+    testImplementation("org.wiremock:wiremock-standalone:3.3.1")
 }
 
 // 모든 Test 태스크에 공통 설정 적용
