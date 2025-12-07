@@ -70,8 +70,9 @@ dependencies {
     // Feign Jackson for contract tests
     testImplementation("io.github.openfeign:feign-jackson:13.1")
 
-    // WireMock for integration testing
-    testImplementation("org.wiremock:wiremock-standalone:3.3.1")
+    // WireMock for integration testing (Spring Cloud Contract 4.1.x는 WireMock 2.x API 사용)
+    // WireMock 3.x는 ResponseTemplateTransformer API가 변경되어 호환되지 않음
+    testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.2")
 }
 
 // 모든 Test 태스크에 공통 설정 적용
