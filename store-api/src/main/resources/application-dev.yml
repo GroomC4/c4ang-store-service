@@ -7,21 +7,21 @@
 spring:
   datasource:
     master:
-      url: ${DB_MASTER_URL:jdbc:postgresql://store-db:5435/store_db}
-      username: ${DB_USERNAME:application}
-      password: ${DB_PASSWORD:application}
+      url: jdbc:postgresql://store-db:5435/store_db
+      username:
+      password:
       driver-class-name: org.postgresql.Driver
     replica:
-      url: ${DB_REPLICA_URL:jdbc:postgresql://store-db:5435/store_db}
-      username: ${DB_USERNAME:application}
-      password: ${DB_PASSWORD:application}
+      url: jdbc:postgresql://store-db:5435/store_db
+      username:
+      password:
       driver-class-name: org.postgresql.Driver
       hikari:
         maximum-pool-size: 5
   data:
     redis:
-      host: ${REDIS_HOST:cache-redis}
-      port: ${REDIS_PORT:6379}
+      host: cache-redis
+      port: 6379
 
 # Platform Core DataSource 라우팅 설정
 platform:
