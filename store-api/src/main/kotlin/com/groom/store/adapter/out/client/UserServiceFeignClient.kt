@@ -1,7 +1,6 @@
 package com.groom.store.adapter.out.client
 
 import com.groom.store.adapter.out.client.dto.UserInternalDto
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
@@ -14,13 +13,13 @@ import java.util.UUID
  * Customer Service의 Internal API와 통신합니다.
  *
  * 테스트 환경에서는 MockUserServiceClient가 사용됩니다.
+ * @Profile("!test")로 테스트 환경에서는 비활성화됩니다.
  */
 @FeignClient(
     name = "user-service",
     url = "\${feign.clients.user-service.url:http://localhost:8081}",
 )
 @Profile("!test")
-@ConditionalOnMissingBean(UserServiceClient::class)
 interface UserServiceFeignClient : UserServiceClient {
     /**
      * 특정 유저 정보 조회
