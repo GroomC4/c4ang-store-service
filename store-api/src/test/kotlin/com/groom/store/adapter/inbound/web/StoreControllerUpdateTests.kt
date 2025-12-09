@@ -1,7 +1,6 @@
 package com.groom.store.adapter.inbound.web
 
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
-import com.groom.store.common.util.IstioHeaderExtractor
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -46,7 +45,7 @@ class StoreControllerUpdateTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 patch("/api/v1/stores/$storeId")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString())
+                    .header("X-User-Id", UPDATE_OWNER_USER_ID_1.toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(updateRequest),
             ).andExpect(status().isOk)
@@ -76,7 +75,7 @@ class StoreControllerUpdateTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 patch("/api/v1/stores/$user1StoreId")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_3.toString())
+                    .header("X-User-Id", UPDATE_OWNER_USER_ID_3.toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(updateRequest),
             ).andDo(print())
@@ -132,7 +131,7 @@ class StoreControllerUpdateTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 patch("/api/v1/stores/$nonExistentStoreId")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString())
+                    .header("X-User-Id", UPDATE_OWNER_USER_ID_1.toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(updateRequest),
             ).andExpect(status().isNotFound)

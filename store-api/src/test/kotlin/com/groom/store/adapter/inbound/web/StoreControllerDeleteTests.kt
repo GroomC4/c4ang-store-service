@@ -3,7 +3,6 @@ package com.groom.store.adapter.inbound.web
 import com.groom.store.adapter.out.persistence.StoreRepository
 import com.groom.store.common.TransactionApplier
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
-import com.groom.store.common.util.IstioHeaderExtractor
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -47,7 +46,7 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 delete("/api/v1/stores/$storeId")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString()),
+                    .header("X-User-Id", UPDATE_OWNER_USER_ID_1.toString()),
             ).andExpect(status().isOk)
             .andExpect(jsonPath("$.storeId").value(storeId))
             .andExpect(jsonPath("$.ownerUserId").value(UPDATE_OWNER_USER_ID_1.toString()))
@@ -73,7 +72,7 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 delete("/api/v1/stores/$user1StoreId")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_3.toString()),
+                    .header("X-User-Id", UPDATE_OWNER_USER_ID_3.toString()),
             ).andDo(print())
             .andExpect(status().isForbidden)
             .andExpect(jsonPath("$.code").value("STORE_ACCESS_DENIED"))
@@ -92,7 +91,7 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 delete("/api/v1/stores/$nonExistentStoreId")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString()),
+                    .header("X-User-Id", UPDATE_OWNER_USER_ID_1.toString()),
             ).andExpect(status().isNotFound)
             .andExpect(jsonPath("$.code").value("STORE_NOT_FOUND"))
     }
@@ -122,7 +121,7 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 delete("/api/v1/stores/$deletedStoreId")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_2.toString()),
+                    .header("X-User-Id", UPDATE_OWNER_USER_ID_2.toString()),
             ).andExpect(status().isConflict)
             .andExpect(jsonPath("$.code").value("STORE_ALREADY_DELETED"))
     }

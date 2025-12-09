@@ -12,12 +12,10 @@ import com.groom.store.application.service.DeleteStoreService
 import com.groom.store.application.service.GetStoreService
 import com.groom.store.application.service.RegisterService
 import com.groom.store.application.service.UpdateService
-import com.groom.store.common.util.IstioHeaderExtractor
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -41,16 +40,14 @@ class StoreController(
     private val updateService: UpdateService,
     private val deleteStoreService: DeleteStoreService,
     private val getStoreService: GetStoreService,
-    private val istioHeaderExtractor: IstioHeaderExtractor,
 ) {
     /**
      * 스토어를 등록한다.
      * 인증된 Owner만 스토어를 등록할 수 있다.
      *
-     * Istio API Gateway가 JWT 검증 후 X-User-Id 헤더로 사용자 ID를 주입하며,
-     * 추가로 애플리케이션 계층(StorePolicy)에서 DB 기반 역할 검증을 수행한다.
+     * Istio API Gateway가 JWT 검증 후 X-User-Id 헤더로 사용자 ID를 주입한다.
      *
-     * @param httpRequest HTTP 요청 (Istio 헤더 추출용)
+     * @param userId 사용자 ID (Istio에서 X-User-Id 헤더로 주입)
      * @param request 스토어 등록 요청
      * @return 등록된 스토어 정보
      */
@@ -66,10 +63,9 @@ class StoreController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun registerStore(
-        httpRequest: HttpServletRequest,
+        @RequestHeader("X-User-Id") userId: UUID,
         @RequestBody request: RegisterStoreRequest,
     ): RegisterStoreResponse {
-        val userId = istioHeaderExtractor.extractUserId(httpRequest)
         val command = request.toCommand(userId)
         val result = registerService.register(command)
         return RegisterStoreResponse.from(result)
@@ -79,6 +75,7 @@ class StoreController(
      * 스토어 정보를 수정한다.
      * 인증된 Owner만 자신의 스토어를 수정할 수 있다.
      *
+     * @param userId 사용자 ID (Istio에서 X-User-Id 헤더로 주입)
      * @param storeId 스토어 ID
      * @param request 스토어 수정 요청
      * @return 수정된 스토어 정보
@@ -95,11 +92,10 @@ class StoreController(
     )
     @PatchMapping("/{storeId}")
     fun updateStore(
-        httpRequest: HttpServletRequest,
+        @RequestHeader("X-User-Id") userId: UUID,
         @PathVariable storeId: UUID,
         @RequestBody request: UpdateStoreRequest,
     ): UpdateStoreResponse {
-        val userId = istioHeaderExtractor.extractUserId(httpRequest)
         val command = request.toCommand(storeId, userId)
         val result = updateService.update(command)
         return UpdateStoreResponse.from(result)
@@ -109,6 +105,7 @@ class StoreController(
      * 스토어를 삭제한다 (소프트 삭제).
      * 인증된 Owner만 자신의 스토어를 삭제할 수 있다.
      *
+     * @param userId 사용자 ID (Istio에서 X-User-Id 헤더로 주입)
      * @param storeId 스토어 ID
      * @return 삭제된 스토어 정보
      */
@@ -123,10 +120,9 @@ class StoreController(
     )
     @DeleteMapping("/{storeId}")
     fun deleteStore(
-        httpRequest: HttpServletRequest,
+        @RequestHeader("X-User-Id") userId: UUID,
         @PathVariable storeId: UUID,
     ): DeleteStoreResponse {
-        val userId = istioHeaderExtractor.extractUserId(httpRequest)
         val command =
             DeleteStoreCommand(
                 storeId = storeId,
@@ -162,6 +158,7 @@ class StoreController(
     /**
      * 내 스토어 조회
      *
+     * @param userId 사용자 ID (Istio에서 X-User-Id 헤더로 주입)
      * @return 스토어 상세 정보
      */
     @Operation(summary = "내 스토어 조회", description = "판매자인 경우 내 스토어의 정보를 조회합니다")
@@ -172,8 +169,9 @@ class StoreController(
         ],
     )
     @GetMapping("/mine")
-    fun getMyStore(httpRequest: HttpServletRequest): GetStoreResponse {
-        val userId = istioHeaderExtractor.extractUserId(httpRequest)
+    fun getMyStore(
+        @RequestHeader("X-User-Id") userId: UUID,
+    ): GetStoreResponse {
         val result = getStoreService.getMyStore(userId)
         return GetStoreResponse.from(result)
     }

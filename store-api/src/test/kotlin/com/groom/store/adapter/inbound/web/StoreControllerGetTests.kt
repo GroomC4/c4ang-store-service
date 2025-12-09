@@ -1,7 +1,6 @@
 package com.groom.store.adapter.inbound.web
 
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
-import com.groom.store.common.util.IstioHeaderExtractor
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -64,7 +63,7 @@ class StoreControllerGetTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 get("/api/v1/stores/mine")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, UPDATE_OWNER_USER_ID_1.toString()),
+                    .header("X-User-Id", UPDATE_OWNER_USER_ID_1.toString()),
             ).andExpect(status().isOk)
             .andExpect(jsonPath("$.storeId").exists())
             .andExpect(jsonPath("$.name").exists())
@@ -80,7 +79,7 @@ class StoreControllerGetTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 get("/api/v1/stores/mine")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, ownerWithoutStore.toString()),
+                    .header("X-User-Id", ownerWithoutStore.toString()),
             ).andExpect(status().isNotFound)
             .andExpect(jsonPath("$.code").value("STORE_NOT_FOUND"))
     }

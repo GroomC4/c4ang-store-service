@@ -3,7 +3,6 @@ package com.groom.store.adapter.inbound.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.groom.store.adapter.inbound.web.dto.RegisterStoreRequest
 import com.groom.store.common.base.StoreBaseControllerIntegrationTest
-import com.groom.store.common.util.IstioHeaderExtractor
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,7 +46,7 @@ class StoreControllerRegisterTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 post("/api/v1/stores")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, OWNER_USER_ID_1.toString())
+                    .header("X-User-Id", OWNER_USER_ID_1.toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(registerStoreRequest)),
             ).andExpect(status().isCreated)
@@ -94,7 +93,7 @@ class StoreControllerRegisterTests : StoreBaseControllerIntegrationTest() {
         mockMvc
             .perform(
                 post("/api/v1/stores")
-                    .header(IstioHeaderExtractor.USER_ID_HEADER, CUSTOMER_USER_ID_1.toString())
+                    .header("X-User-Id", CUSTOMER_USER_ID_1.toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(registerStoreRequest)),
             ).andDo(print())
