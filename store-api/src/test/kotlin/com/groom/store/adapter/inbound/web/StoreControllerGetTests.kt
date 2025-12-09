@@ -85,11 +85,11 @@ class StoreControllerGetTests : StoreBaseControllerIntegrationTest() {
     }
 
     @Test
-    @DisplayName("GET /api/v1/stores/mine - 인증되지 않은 요청은 500 Internal Server Error를 반환한다")
+    @DisplayName("GET /api/v1/stores/mine - 인증되지 않은 요청은 400 Bad Request를 반환한다")
     fun testGetMyStore_Unauthorized() {
-        // when & then: X-User-Id 헤더가 없으면 IstioHeaderExtractor에서 예외 발생
+        // when & then: X-User-Id 헤더가 없으면 Spring이 필수 헤더 누락으로 400 반환
         mockMvc
             .perform(get("/api/v1/stores/mine"))
-            .andExpect(status().isInternalServerError)
+            .andExpect(status().isBadRequest)
     }
 }

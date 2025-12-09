@@ -84,7 +84,7 @@ class StoreControllerUpdateTests : StoreBaseControllerIntegrationTest() {
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/stores/{storeId} - 인증되지 않은 요청은 500 Internal Server Error를 반환한다 (X-User-Id 헤더 누락)")
+    @DisplayName("PATCH /api/v1/stores/{storeId} - 인증되지 않은 요청은 400 Bad Request를 반환한다 (X-User-Id 헤더 누락)")
     fun testUnauthorizedStoreUpdate() {
         // given
         val updateRequest =
@@ -100,13 +100,13 @@ class StoreControllerUpdateTests : StoreBaseControllerIntegrationTest() {
                 .randomUUID()
                 .toString()
 
-        // when & then: X-User-Id 헤더가 없으면 IstioHeaderExtractor에서 예외 발생
+        // when & then: X-User-Id 헤더가 없으면 Spring이 필수 헤더 누락으로 400 반환
         mockMvc
             .perform(
                 patch("/api/v1/stores/$fakeStoreId")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(updateRequest),
-            ).andExpect(status().isInternalServerError)
+            ).andExpect(status().isBadRequest)
     }
 
     @Test

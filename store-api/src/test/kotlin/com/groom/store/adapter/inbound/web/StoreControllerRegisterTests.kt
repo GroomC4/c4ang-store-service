@@ -58,7 +58,7 @@ class StoreControllerRegisterTests : StoreBaseControllerIntegrationTest() {
     }
 
     @Test
-    @DisplayName("POST /api/v1/stores - 인증되지 않은 요청은 500 Internal Server Error를 반환한다 (X-User-Id 헤더 누락)")
+    @DisplayName("POST /api/v1/stores - 인증되지 않은 요청은 400 Bad Request를 반환한다 (X-User-Id 헤더 누락)")
     fun testUnauthorizedStoreRegistration() {
         // given
         val registerStoreRequest =
@@ -67,13 +67,13 @@ class StoreControllerRegisterTests : StoreBaseControllerIntegrationTest() {
                 description = "인증 없이 등록 시도",
             )
 
-        // when & then: X-User-Id 헤더가 없으면 IstioHeaderExtractor에서 예외 발생
+        // when & then: X-User-Id 헤더가 없으면 Spring이 필수 헤더 누락으로 400 반환
         mockMvc
             .perform(
                 post("/api/v1/stores")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(registerStoreRequest)),
-            ).andExpect(status().isInternalServerError)
+            ).andExpect(status().isBadRequest)
     }
 
     @org.junit.jupiter.api.Disabled(

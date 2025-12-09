@@ -97,7 +97,7 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/stores/{storeId} - 인증되지 않은 요청은 500 Internal Server Error를 반환한다")
+    @DisplayName("DELETE /api/v1/stores/{storeId} - 인증되지 않은 요청은 400 Bad Request를 반환한다")
     fun testDeleteStore_Unauthorized() {
         // given
         val fakeStoreId =
@@ -105,10 +105,10 @@ class StoreControllerDeleteTests : StoreBaseControllerIntegrationTest() {
                 .randomUUID()
                 .toString()
 
-        // when & then: X-User-Id 헤더가 없으면 IstioHeaderExtractor에서 예외 발생
+        // when & then: X-User-Id 헤더가 없으면 Spring이 필수 헤더 누락으로 400 반환
         mockMvc
             .perform(delete("/api/v1/stores/$fakeStoreId"))
-            .andExpect(status().isInternalServerError)
+            .andExpect(status().isBadRequest)
     }
 
     @Test
